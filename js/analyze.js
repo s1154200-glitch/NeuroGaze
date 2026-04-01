@@ -4,7 +4,19 @@
     /* ── Sidebar toggles ─────────────────────────────────────── */
     var sidebar = document.getElementById('sidebar');
     var hamburger = document.getElementById('hamburger');
-    if (hamburger) hamburger.addEventListener('click', function () { sidebar.classList.toggle('expanded'); });
+    var backdrop  = document.getElementById('sidebar-backdrop');
+
+    function closeSidebar() {
+      sidebar.classList.remove('expanded');
+      if (backdrop) backdrop.classList.remove('visible');
+    }
+
+    if (hamburger) hamburger.addEventListener('click', function () {
+      sidebar.classList.toggle('expanded');
+      if (backdrop) backdrop.classList.toggle('visible', sidebar.classList.contains('expanded'));
+    });
+
+    if (backdrop) backdrop.addEventListener('click', closeSidebar);
 
     function initDropdown(btnId, groupId) {
       var btn = document.getElementById(btnId);

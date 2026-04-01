@@ -293,3 +293,13 @@
       }
       .dt-cards-grid { grid-template-columns: 1fr; }
     }
+
+    @media (max-width: 500px) {
+      .res-section { padding: 18px 14px; }
+      .res-section h3 { font-size: 1rem; }
+      .res-comp-top { padding: 16px 14px; }
+      .res-card-val { font-size: 1.6rem; }
+      .res-card-lbl { font-size: 0.68rem; }
+      .res-hdr-score { font-size: 2rem; }
+      .res-hdr-label { font-size: 0.7rem; }
+    }

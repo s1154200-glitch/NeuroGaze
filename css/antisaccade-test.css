@@ -497,6 +497,29 @@
 @media (max-width: 640px) {
   .ast-cards-grid { grid-template-columns: 1fr; }
   .ast-info-grid  { grid-template-columns: 1fr; }
+
+  /* Intro card */
+  .ast-intro-card { padding: 20px 16px 18px; }
+  .ast-intro-card h1 { font-size: 1.4rem; }
+  .ast-intro-btns { flex-direction: column; align-items: stretch; }
+  .ast-intro-btns button { width: 100%; }
+
+  /* HUD */
+  .ast-hud-metrics { gap: 8px; }
+  .ast-hud-metric-val { font-size: 0.82rem; }
+  .ast-hud-metric-lbl { font-size: 0.55rem; }
+  .ast-hud-trial-num  { font-size: 1.1rem; }
+
+  /* Results */
+  .ast-results-wrap { padding: 20px 14px 32px; }
+  .ast-results-header h2 { font-size: 1.3rem; }
+}
+
+@media (max-width: 420px) {
+  .ast-intro-card { padding: 16px 12px; }
+  .ast-intro-card h1 { font-size: 1.2rem; }
+  .ast-hud-trial { padding: 6px 10px; }
+  .ast-hud-metrics { gap: 5px; }
 }
 
 .ast-result-card {

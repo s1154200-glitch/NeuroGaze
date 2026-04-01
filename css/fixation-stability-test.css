@@ -384,6 +384,36 @@
   .adhd-info-grid { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 640px) {
+  /* Intro card */
+  .adhd-intro-card { padding: 20px 16px 18px; }
+  .adhd-intro-card h1 { font-size: 1.4rem; }
+  .adhd-subtitle { font-size: 0.72rem; }
+  .adhd-info-grid { grid-template-columns: 1fr; }
+  .btn-adhd { padding: 12px 28px; font-size: 0.95rem; width: 100%; }
+
+  /* HUD */
+  .hud { padding: 8px 12px; gap: 10px; }
+  .hud-timer-wrap { width: 40px; height: 40px; }
+  .hud-timer-text { font-size: 0.85rem; }
+  .hud-metrics { gap: 8px; }
+  .hud-metric-val { font-size: 0.78rem; }
+  .hud-metric-lbl { font-size: 0.55rem; }
+
+  /* Results wrap */
+  .adhd-results-wrap { padding: 20px 14px 32px; }
+  .results-header h2 { font-size: 1.3rem; }
+}
+
+@media (max-width: 420px) {
+  .adhd-intro-card { padding: 16px 12px 14px; }
+  .adhd-intro-card h1 { font-size: 1.2rem; }
+  .adhd-instructions { padding: 10px 12px; }
+  .adhd-instructions p { font-size: 0.78rem; }
+  .hud-metrics { gap: 5px; }
+  .hud-timer-wrap { display: none; }
+}
+
 .result-card {
   background: rgba(12,12,28,0.9);
   border: 1px solid rgba(255,255,255,0.06);

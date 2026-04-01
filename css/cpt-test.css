@@ -482,6 +482,28 @@
 @media (max-width: 640px) {
   .cpt-cards-grid { grid-template-columns: 1fr; }
   .cpt-info-grid  { grid-template-columns: 1fr; }
+
+  /* Intro card */
+  .cpt-intro-card { padding: 20px 16px 18px; }
+  .cpt-intro-card h1 { font-size: 1.4rem; }
+
+  /* HUD */
+  .cpt-hud-metrics { gap: 8px; }
+  .cpt-hud-metric-val { font-size: 0.82rem; }
+  .cpt-hud-metric-lbl { font-size: 0.55rem; }
+  .cpt-hud-timer-wrap { width: 40px; height: 40px; }
+  .cpt-hud-timer-text { font-size: 0.85rem; }
+
+  /* Results */
+  .cpt-results-wrap { padding: 20px 14px 32px; }
+  .cpt-results-header h2 { font-size: 1.3rem; }
+}
+
+@media (max-width: 420px) {
+  .cpt-intro-card { padding: 16px 12px; }
+  .cpt-intro-card h1 { font-size: 1.2rem; }
+  .cpt-hud-metrics { gap: 5px; }
+  .cpt-hud-timer-wrap { display: none; }
 }
 
 .cpt-result-card {

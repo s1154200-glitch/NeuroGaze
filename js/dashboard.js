@@ -8,9 +8,21 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── Sidebar expand/collapse ─────────────────────────────────
   var sidebar   = document.getElementById('sidebar');
   var hamburger = document.getElementById('hamburger');
+  var backdrop  = document.getElementById('sidebar-backdrop');
+
+  function closeSidebar() {
+    sidebar.classList.remove('expanded');
+    if (backdrop) backdrop.classList.remove('visible');
+  }
+
   hamburger.addEventListener('click', function () {
     sidebar.classList.toggle('expanded');
+    if (backdrop) backdrop.classList.toggle('visible', sidebar.classList.contains('expanded'));
   });
+
+  if (backdrop) {
+    backdrop.addEventListener('click', closeSidebar);
+  }
 
   // ── ADHD Tests sidebar dropdown ──────────────────────────────
   var navTests      = document.getElementById('nav-tests');

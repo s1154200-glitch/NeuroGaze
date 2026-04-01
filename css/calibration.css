@@ -587,10 +587,21 @@ html, body {
    Responsive
    ============================================================ */
 @media (max-width: 600px) {
-  .welcome-card { padding: 32px 22px; }
-  .welcome-card h1 { font-size: 1.7rem; }
+  .welcome-card { padding: 26px 18px; }
+  .welcome-card h1 { font-size: 1.45rem; }
+  .welcome-card p  { font-size: 0.84rem; }
+  .checklist-item  { font-size: 0.82rem; }
   .success-hud { padding: 4px 8px; }
   .stats-row { gap: 3px; }
+}
+
+@media (max-width: 480px) {
+  .welcome-card { padding: 20px 14px; }
+  .welcome-card h1 { font-size: 1.25rem; }
+  .stats-row { flex-direction: column; }
+  .stat-chip { width: 100%; text-align: center; }
+  .accuracy-ring { width: 100px; height: 100px; }
+  .btn-primary { padding: 12px 24px; font-size: 0.92rem; }
 }
 
 /* ============================================================

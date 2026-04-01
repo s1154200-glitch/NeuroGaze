@@ -7,9 +7,10 @@
 ![Browser](https://img.shields.io/badge/browser-Chrome%20%7C%20Edge-4285F4?logo=googlechrome&logoColor=white)
 ![No Install](https://img.shields.io/badge/install-none%20required-brightgreen)
 ![Storage](https://img.shields.io/badge/data-local%20only-orange)
+![Responsive](https://img.shields.io/badge/layout-responsive-success)
 ![WebGazer](https://img.shields.io/badge/powered%20by-WebGazer.js-blueviolet)
 
-**NeuroGaze** is a browser-based ADHD screening tool that uses your webcam and [WebGazer.js](https://webgazer.cs.brown.edu/) to measure eye-movement biomarkers associated with attention and impulse control. No installation required — open the HTML files in any modern desktop browser.
+**NeuroGaze** is a browser-based ADHD screening tool that uses your webcam and [WebGazer.js](https://webgazer.cs.brown.edu/) to measure eye-movement biomarkers associated with attention and impulse control. No installation required — open the HTML files in any modern desktop browser. The UI is fully responsive and adapts to any screen size.
 
 </div>
 
@@ -41,6 +42,7 @@
 | 📊 | **Dashboard** showing test status and per-biomarker zone indicators |
 | 📈 | **Results page** with detailed charts and per-test breakdowns |
 | 🔍 | **Analysis page** with trend tracking across multiple sessions |
+| 📱 | **Fully responsive UI** — adapts to any screen size from desktop to mobile |
 | 🛠️ | **Fake data generator** (`fake-data.html`) for development and demo purposes |
 
 ---
@@ -52,7 +54,7 @@
 | **Browser** | Chrome or Edge (desktop) — WebGazer relies on the MediaPipe FaceMesh API |
 | **Webcam** | Any standard webcam; a front-facing laptop camera works fine |
 | **Lighting** | Stable, even front lighting — avoid backlighting |
-| **Screen** | Laptop or monitor; avoid mobile/tablet (gaze accuracy degrades at small sizes) |
+| **Screen** | Any screen size — the UI is fully responsive. For accurate gaze tracking, a **desktop or laptop** is strongly recommended (webcam gaze accuracy degrades significantly on small phone screens) |
 | **Internet** | Required on first load to fetch MediaPipe FaceMesh assets from CDN |
 
 ---
@@ -375,6 +377,18 @@ Run a calibration first, then complete the desired test. The dashboard reads fro
 <summary><strong>Results look unrealistic</strong></summary>
 
 WebGazer adds ~2–4° of gaze scatter compared to clinical eye trackers. Thresholds in the tests are adjusted for this, but results are best interpreted as **trends across multiple sessions** rather than single absolute values.
+</details>
+
+<details>
+<summary><strong>Sidebar is hidden on mobile</strong></summary>
+
+On small screens the sidebar collapses automatically. Tap the **hamburger menu** (☰) in the top-left to open it as a slide-in drawer. Tap anywhere on the dimmed overlay to close it again.
+</details>
+
+<details>
+<summary><strong>Tests and games seem small / zoomed out on mobile</strong></summary>
+
+Test and game canvases fill the full screen regardless of device. Gaze-based tests require a front-facing camera at ~50–70 cm distance — this works best on a desktop or laptop. Mobile cameras have narrower fields of view, which reduces gaze accuracy.
 </details>
 
 ---

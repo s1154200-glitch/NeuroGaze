@@ -732,6 +732,23 @@ body {
 .bio-t-adhd { color: rgba(255,59,48,0.55); }
 
 /* ── Responsive ────────────────────────────────────────────── */
+
+/* Mobile sidebar backdrop — hidden by default at all sizes */
+#sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 299;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+#sidebar-backdrop.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
 @media (max-width: 900px) {
   .dash-grid {
     grid-template-columns: 1fr;
@@ -741,14 +758,47 @@ body {
   }
 }
 
+@media (max-width: 768px) {
+  .topbar-pill { display: none; }
+  .page-title { font-size: 1.1rem; }
+}
+
 @media (max-width: 600px) {
-  .sidebar { display: none; }
+  html, body { overflow: hidden; }
+
+  /* Sidebar becomes a slide-in drawer overlay */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 100%;
+    width: 240px !important;
+    z-index: 300;
+    transform: translateX(-100%);
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+    overflow-y: auto;
+  }
+  .sidebar.expanded {
+    transform: translateX(0);
+    box-shadow: 6px 0 40px rgba(0, 0, 0, 0.75);
+    width: 240px;
+  }
+  #sidebar-backdrop { display: block; }
+
   .topbar { padding: 0 14px; }
   .dash-grid { padding: 14px; gap: 12px; }
   .cal-hero { flex-direction: column; text-align: center; }
   .cal-stats-row { flex-direction: column; }
   .stat-tiles { grid-template-columns: 1fr; }
   .adhd-info-grid { grid-template-columns: 1fr; }
+  .card-label { font-size: 0.65rem; }
+}
+
+@media (max-width: 420px) {
+  .page-title { font-size: 1rem; }
+  .topbar { height: 52px; }
+  .card-header { flex-wrap: wrap; gap: 6px; }
+  .test-item { padding: 10px 12px; }
+  .dash-grid { padding: 10px; gap: 10px; }
 }
 
 /* Scrollbar */

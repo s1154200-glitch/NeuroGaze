@@ -730,3 +730,48 @@
 
     /* ── Animations ───────────────────────────────────────── */
     @keyframes spin { to { transform: rotate(360deg); } }
+
+
+    /* ================================================================
+       RESPONSIVE — auto-adjusts for mobile and tablet
+       ================================================================ */
+    @media (max-width: 768px) {
+      .intro-card {
+        padding: 28px 24px;
+        max-width: calc(100vw - 32px);
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .intro-title  { font-size: 1.6rem; }
+      .intro-rules  { padding: 12px 16px; }
+      .go-card, .levelup-card {
+        padding: 28px 22px;
+        max-width: calc(100vw - 32px);
+      }
+      .go-title { font-size: 1.65rem; }
+      .go-scores { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .intro-card     { padding: 18px 14px; }
+      .intro-title    { font-size: 1.3rem; }
+      .intro-icon     { font-size: 48px; margin-bottom: 12px; }
+      .intro-subtitle { font-size: 0.85rem; }
+      .intro-rules    { font-size: 0.82rem; padding: 10px 12px; }
+
+      .btn-primary { padding: 12px 22px; font-size: 0.92rem; width: 100%; }
+      .btn-sm      { width: 100%; text-align: center; }
+
+      /* HUD compact */
+      .hud       { padding: 5px 6px; gap: 0; }
+      .hud-item  { padding: 3px 8px; }
+      .hud-label { font-size: 0.5rem; }
+      .hud-value { font-size: 0.8rem; }
+
+      /* End / level-up card */
+      .go-card, .levelup-card { padding: 18px 14px; }
+      .go-icon  { width: 58px; height: 58px; font-size: 28px; margin-bottom: 14px; }
+      .go-title { font-size: 1.2rem; }
+      .go-sub   { font-size: 0.82rem; margin-bottom: 18px; }
+      .go-scores { grid-template-columns: 1fr 1fr; gap: 8px; }
+    }

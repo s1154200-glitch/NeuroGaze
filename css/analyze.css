@@ -84,3 +84,24 @@
     .pdf-mode .az-chart-wrap{background:#1a1a2e!important;border-radius:10px!important}
 
     @media print{.sidebar,.topbar,.az-btn{display:none!important}.main{margin:0!important;padding:10px!important}.az-card{break-inside:avoid;page-break-inside:avoid}}
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .az-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .az-header h2 { font-size: 1.15rem; }
+      .az-chart-wrap { height: 220px; }
+      .az-metrics { grid-template-columns: repeat(2, 1fr); }
+      .az-overall-metrics { grid-template-columns: repeat(2, 1fr); }
+      .az-card { padding: 18px 16px; }
+    }
+
+    @media (max-width: 500px) {
+      .az-metrics { grid-template-columns: 1fr 1fr; }
+      .az-overall-metrics { grid-template-columns: 1fr 1fr; }
+      .az-chart-wrap { height: 180px; }
+      .az-btn { font-size: 0.75rem; padding: 8px 14px; }
+      .az-card { padding: 14px 12px; }
+      .az-card-hdr h3 { font-size: 0.9rem; }
+      .az-metric-val { font-size: 1.1rem; }
+      .az-score-ring { width: 96px; height: 96px; }
+    }
