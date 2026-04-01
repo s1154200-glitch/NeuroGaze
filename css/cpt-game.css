@@ -770,7 +770,7 @@
 
       /* End / level-up card */
       .go-card, .levelup-card { padding: 18px 14px; }
-      .go-icon  { width: 58px; height: 58px; font-size: 28px; margin-bottom: 14px; }
+      .go-icon  { width: 100%; max-width: 260px; height: auto; font-size: 28px; margin-bottom: 14px; }
       .go-title { font-size: 1.2rem; }
       .go-sub   { font-size: 0.82rem; margin-bottom: 18px; }
       .go-scores { grid-template-columns: 1fr 1fr; gap: 8px; }

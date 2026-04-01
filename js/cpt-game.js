@@ -584,7 +584,7 @@
 
     var goIconEl = $('go-icon');
     if (reason === 'omission') {
-      goIconEl.innerHTML = makeKoiSVG(200, 92);
+      goIconEl.innerHTML = makeKoiSVG('100%', 'auto');
     } else {
       goIconEl.textContent = icons[reason] || '🐟';
     }
