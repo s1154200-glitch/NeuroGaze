@@ -220,22 +220,17 @@
   // ─────────────────────────────────────────────────────────
   function makeLotusLeafSVG() {
     var lid = 'lotus' + Date.now() + Math.floor(Math.random() * 9999);
-    // Pac-man path (no mask): sharp crisp notch on all screens
-    // Notch edges = where lines from centre to (52,8) and (68,8) intersect r=48 circle → (52.7,12.6) and (67.3,12.6)
-    var leafPath = 'M 60 60 L 52.7 12.6 A 48 48 0 1 1 67.3 12.6 Z';
+    // Sharp, crisp leaf with notch using even-odd fill instead of mask to avoid mobile blurring.
+    var leafPath = 'M60 12 A48 48 0 1 1 59.999 12 Z M52 8 Q60 2 68 8 L60 60 Z';
     return '<svg viewBox="0 0 120 120" width="180" height="180" xmlns="http://www.w3.org/2000/svg">' +
-      '<defs>' +
-        '<clipPath id="' + lid + '-c">' +
-          '<path d="' + leafPath + '"/>' +
-        '</clipPath>' +
-      '</defs>' +
       // Shadow
       '<circle cx="64" cy="64" r="48" fill="rgba(0,0,0,0.1)"/>' +
-      // Leaf body — direct path, no mask
-      '<path d="' + leafPath + '" fill="#3a9d50" stroke="#2e8040" stroke-width="1"/>' +
-      // Lighter inner ring (clipped)
-      '<circle cx="60" cy="60" r="40" fill="none" stroke="rgba(120,220,120,0.15)" stroke-width="1" clip-path="url(#' + lid + '-c)"/>' +
-      // Veins (clipped)
+      // Leaf body with notch
+      '<path d="' + leafPath + '" fill="#3a9d50" stroke="#2e8040" stroke-width="1" fill-rule="evenodd"/>' +
+      // Inner ring
+      '<circle cx="60" cy="60" r="40" fill="none" stroke="rgba(120,220,120,0.15)" stroke-width="1"/>' +
+      // Veins clipped by circle (no notch clipping required for veins)
+      '<defs><clipPath id="' + lid + '-c"><circle cx="60" cy="60" r="48"/></clipPath></defs>' +
       '<g clip-path="url(#' + lid + '-c)" opacity="0.35">' +
         '<line x1="60" y1="60" x2="60" y2="14" stroke="#6abf6a" stroke-width="1"/>' +
         '<line x1="60" y1="60" x2="26" y2="32" stroke="#6abf6a" stroke-width="0.8"/>' +
@@ -246,8 +241,7 @@
         '<line x1="60" y1="60" x2="90" y2="90" stroke="#6abf6a" stroke-width="0.7"/>' +
         '<line x1="60" y1="60" x2="60" y2="106" stroke="#6abf6a" stroke-width="0.7"/>' +
       '</g>' +
-      // Centre dot
-      '<circle cx="60" cy="60" r="3" fill="rgba(120,200,120,0.3)" clip-path="url(#' + lid + '-c)"/>' +
+      '<circle cx="60" cy="60" r="3" fill="rgba(120,200,120,0.3)"/>' +
     '</svg>';
   }
 
