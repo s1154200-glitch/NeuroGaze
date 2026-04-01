@@ -220,7 +220,7 @@
   // ─────────────────────────────────────────────────────────
   function makeLotusLeafSVG() {
     var lid = 'lotus' + Date.now() + Math.floor(Math.random() * 9999);
-    // Lily-pad: circle with V-notch at top. Path: centre → left-notch → large-arc CW → right-notch → close
+    // Lily-pad: proper arc path with V-notch, solid fills only (no url() refs), veins clipped inside
     var leafPath = 'M 100 100 L 77 18 A 85 85 0 1 1 123 18 Z';
     var veins = [
       [100,15],[138,24],[166,52],[176,90],[166,138],[138,166],[100,175],[62,166],[34,138],[24,90],[34,52],[62,24]
@@ -231,22 +231,15 @@
     }
     return '<svg viewBox="0 0 200 200" width="180" height="180" xmlns="http://www.w3.org/2000/svg">' +
       '<defs>' +
-        '<radialGradient id="' + lid + '-g" cx="50%" cy="55%" r="55%">' +
-          '<stop offset="0%"   stop-color="#62c97a"/>' +
-          '<stop offset="100%" stop-color="#1e7535"/>' +
-        '</radialGradient>' +
         '<clipPath id="' + lid + '-c"><path d="' + leafPath + '"/></clipPath>' +
       '</defs>' +
-      // Drop shadow
       '<ellipse cx="104" cy="108" rx="82" ry="82" fill="rgba(0,0,0,0.15)"/>' +
-      // Leaf body
-      '<path d="' + leafPath + '" fill="url(#' + lid + '-g)" stroke="#155c22" stroke-width="2.5"/>' +
-      // Veins clipped inside leaf
-      '<g clip-path="url(#' + lid + '-c)" stroke="#4ab860" stroke-width="1.1" fill="none" opacity="0.50">' +
+      '<path d="' + leafPath + '" fill="#3aa84e" stroke="#1d6b2e" stroke-width="2.5"/>' +
+      '<path d="' + leafPath + '" fill="rgba(120,220,140,0.18)" clip-path="url(#' + lid + '-c)"/>' +
+      '<g clip-path="url(#' + lid + '-c)" stroke="#4abf60" stroke-width="1.1" fill="none" opacity="0.55">' +
         veinLines +
       '</g>' +
-      // Centre navel
-      '<circle cx="100" cy="100" r="5" fill="rgba(140,255,160,0.45)" clip-path="url(#' + lid + '-c)"/>' +
+      '<circle cx="100" cy="100" r="5" fill="rgba(160,255,180,0.50)" clip-path="url(#' + lid + '-c)"/>' +
     '</svg>';
   }
 
