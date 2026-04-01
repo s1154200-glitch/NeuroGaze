@@ -303,3 +303,9 @@
       .res-hdr-score { font-size: 2rem; }
       .res-hdr-label { font-size: 0.7rem; }
     }
+
+    /* ── Portrait phone orientation ──────────────────────────── */
+    @media (max-width: 600px) and (orientation: portrait) {
+      .main { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      .dash-grid { overflow-y: auto; }
+    }

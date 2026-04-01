@@ -764,7 +764,14 @@ body {
 }
 
 @media (max-width: 600px) {
-  html, body { overflow: hidden; }
+  /* Allow vertical scroll in portrait; prevent horizontal blowout */
+  html { overflow: hidden; }
+  body { overflow-x: hidden; overflow-y: hidden; }
+  .dash-grid {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
 
   /* Sidebar becomes a slide-in drawer overlay */
   .sidebar {

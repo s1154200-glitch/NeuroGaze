@@ -785,3 +785,32 @@
       .go-sub   { font-size: 0.82rem; margin-bottom: 18px; }
       .go-scores { grid-template-columns: 1fr 1fr; gap: 8px; }
     }
+
+/* ── Portrait phone orientation ─────────────────────────────── */
+@media (max-width: 600px) and (orientation: portrait) {
+  /* Intro card: scrollable, not clipped */
+  .intro-card {
+    max-width: calc(100vw - 20px);
+    max-height: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #screen-intro, #screen-gameover, #screen-levelup {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    align-items: flex-start;
+    padding: 20px 0 40px;
+  }
+  .go-card, .levelup-card {
+    max-width: calc(100vw - 20px);
+  }
+  /* Stack button rows */
+  .btn-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-row .btn, .btn-row .btn-ghost {
+    min-width: unset;
+    width: 100%;
+  }
+}

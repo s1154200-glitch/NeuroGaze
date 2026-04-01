@@ -567,3 +567,29 @@
   white-space: nowrap;
   pointer-events: none;
 }
+
+/* ── Portrait phone orientation ─────────────────────────────── */
+@media (max-width: 600px) and (orientation: portrait) {
+  /* Intro screen: allow vertical scroll so nothing is cut off */
+  #adhd-intro-screen,
+  #dr-intro-screen {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    align-items: flex-start;
+    padding: 20px 0 40px;
+  }
+  .adhd-intro-card,
+  .dr-intro-card {
+    max-width: calc(100vw - 24px);
+    max-height: none;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Results screen: full scroll */
+  #adhd-results-screen,
+  #dr-results-screen {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

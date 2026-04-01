@@ -777,3 +777,19 @@ html, body {
   display: flex; align-items: center; justify-content: space-between;
   padding: 5px 2px; font-size: 0.88rem; color: #888;
 }
+
+/* ── Portrait phone orientation ─────────────────────────────── */
+@media (max-width: 600px) and (orientation: portrait) {
+  html, body { overflow: hidden; }
+  #intro-screen {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    align-items: flex-start;
+    padding: 16px 0 32px;
+  }
+  .welcome-card {
+    max-width: calc(100vw - 24px);
+    width: 100%;
+    margin: auto;
+  }
+}

@@ -726,3 +726,29 @@
 }
 .ast-look-away-text.side-right { display: block; left: 12%; }  /* stim right → text on left */
 .ast-look-away-text.side-left  { display: block; right: 12%; } /* stim left  → text on right */
+
+/* ── Portrait phone orientation ─────────────────────────────── */
+@media (max-width: 600px) and (orientation: portrait) {
+  /* Intro screen: allow vertical scroll so nothing is cut off */
+  #adhd-intro-screen,
+  #ast-intro-screen {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    align-items: flex-start;
+    padding: 20px 0 40px;
+  }
+  .adhd-intro-card,
+  .ast-intro-card {
+    max-width: calc(100vw - 24px);
+    max-height: none;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Results screen: full scroll */
+  #adhd-results-screen,
+  #ast-results-screen {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

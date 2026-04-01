@@ -105,3 +105,10 @@
       .az-metric-val { font-size: 1.1rem; }
       .az-score-ring { width: 96px; height: 96px; }
     }
+
+    /* ── Portrait phone orientation ──────────────────────────── */
+    @media (max-width: 600px) and (orientation: portrait) {
+      .main { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      .dash-grid { overflow-y: auto; }
+      .az-metrics { grid-template-columns: 1fr 1fr; }
+    }
