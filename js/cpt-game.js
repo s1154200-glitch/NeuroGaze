@@ -80,7 +80,9 @@
   // ─────────────────────────────────────────────────────────
   //  KOI FISH SVG GENERATOR
   // ─────────────────────────────────────────────────────────
-  function makeKoiSVG() {
+  function makeKoiSVG(svgW, svgH) {
+    svgW = svgW || 240;
+    svgH = svgH || 110;
     var p = KOI_PALETTES[Math.floor(Math.random() * KOI_PALETTES.length)];
     var id = 'koi' + Date.now() + Math.floor(Math.random() * 9999);
 
@@ -101,7 +103,7 @@
     var bodyPath = 'M 8 55 C 6 49, 8 45, 12 42 C 30 30, 64 28, 105 30 C 148 33, 183 43, 192 55 C 183 67, 148 77, 105 80 C 64 82, 30 78, 12 66 C 8 62, 6 59, 8 55 Z';
 
     var svg =
-    '<svg viewBox="0 0 240 110" width="240" height="110" xmlns="http://www.w3.org/2000/svg">' +
+    '<svg viewBox="0 0 240 110" width="' + svgW + '" height="' + svgH + '" xmlns="http://www.w3.org/2000/svg">' +
 
     '<defs>' +
       '<clipPath id="' + id + '-body">' +
@@ -218,33 +220,49 @@
   // ─────────────────────────────────────────────────────────
   function makeLotusLeafSVG() {
     var lid = 'lotus' + Date.now() + Math.floor(Math.random() * 9999);
-    // Bright green lily pad matching reference — pac-man shape with transparent V-notch
-    return '<svg viewBox="0 0 120 120" width="180" height="180" xmlns="http://www.w3.org/2000/svg">' +
+    // High-quality lotus / lily-pad: proper arc path with V-notch, radial gradient, clipped veins
+    // Leaf shape: M center L notch-left A big-arc-cw notch-right Z  (viewBox 200×200, centre 100,100 r=83)
+    var leafPath = 'M 100 100 L 79 20 A 83 83 0 1 1 121 20 Z';
+    return '<svg viewBox="0 0 200 200" width="200" height="200" xmlns="http://www.w3.org/2000/svg">' +
       '<defs>' +
-        '<mask id="' + lid + '-m">' +
-          '<rect width="120" height="120" fill="white"/>' +
-          '<path d="M 60 60 L 52 8 Q 60 2 68 8 Z" fill="black"/>' +
-        '</mask>' +
+        '<radialGradient id="' + lid + '-g" cx="48%" cy="46%" r="54%">' +
+          '<stop offset="0%"   stop-color="#7ddc96"/>' +
+          '<stop offset="42%"  stop-color="#3da558"/>' +
+          '<stop offset="100%" stop-color="#1f6b32"/>' +
+        '</radialGradient>' +
+        '<radialGradient id="' + lid + '-sh" cx="38%" cy="33%" r="52%">' +
+          '<stop offset="0%"   stop-color="rgba(255,255,255,0.25)"/>' +
+          '<stop offset="100%" stop-color="rgba(255,255,255,0)"/>' +
+        '</radialGradient>' +
+        '<clipPath id="' + lid + '-c">' +
+          '<path d="' + leafPath + '"/>' +
+        '</clipPath>' +
       '</defs>' +
-      // Shadow
-      '<circle cx="64" cy="64" r="48" fill="rgba(0,0,0,0.1)"/>' +
+      // Drop shadow
+      '<ellipse cx="105" cy="109" rx="79" ry="79" fill="rgba(0,0,0,0.18)"/>' +
       // Leaf body
-      '<circle cx="60" cy="60" r="48" fill="#3a9d50" stroke="#2e8040" stroke-width="1" mask="url(#' + lid + '-m)"/>' +
-      // Lighter inner ring
-      '<circle cx="60" cy="60" r="40" fill="none" stroke="rgba(120,220,120,0.15)" stroke-width="1" mask="url(#' + lid + '-m)"/>' +
-      // Veins radiating from center (masked)
-      '<g mask="url(#' + lid + '-m)" opacity="0.35">' +
-        '<line x1="60" y1="60" x2="60" y2="14" stroke="#6abf6a" stroke-width="1"/>' +
-        '<line x1="60" y1="60" x2="26" y2="32" stroke="#6abf6a" stroke-width="0.8"/>' +
-        '<line x1="60" y1="60" x2="94" y2="32" stroke="#6abf6a" stroke-width="0.8"/>' +
-        '<line x1="60" y1="60" x2="14" y2="56" stroke="#6abf6a" stroke-width="0.7"/>' +
-        '<line x1="60" y1="60" x2="106" y2="56" stroke="#6abf6a" stroke-width="0.7"/>' +
-        '<line x1="60" y1="60" x2="30" y2="90" stroke="#6abf6a" stroke-width="0.7"/>' +
-        '<line x1="60" y1="60" x2="90" y2="90" stroke="#6abf6a" stroke-width="0.7"/>' +
-        '<line x1="60" y1="60" x2="60" y2="106" stroke="#6abf6a" stroke-width="0.7"/>' +
+      '<path d="' + leafPath + '" fill="url(#' + lid + '-g)" stroke="#196228" stroke-width="1.8"/>' +
+      // Rim highlight
+      '<path d="M 79 20 A 83 83 0 1 1 121 20" fill="none" stroke="rgba(180,255,190,0.32)" stroke-width="3.5" stroke-linecap="round"/>' +
+      // Veins — clipped inside leaf, radiating from centre every ~30°
+      '<g clip-path="url(#' + lid + '-c)" stroke="#3a8849" stroke-linecap="round" fill="none">' +
+        '<line x1="100" y1="100" x2="142" y2="28"  stroke-width="1.4" opacity="0.65"/>' +
+        '<line x1="100" y1="100" x2="172" y2="58"  stroke-width="1.3" opacity="0.60"/>' +
+        '<line x1="100" y1="100" x2="183" y2="100" stroke-width="1.3" opacity="0.60"/>' +
+        '<line x1="100" y1="100" x2="172" y2="142" stroke-width="1.3" opacity="0.60"/>' +
+        '<line x1="100" y1="100" x2="142" y2="172" stroke-width="1.2" opacity="0.55"/>' +
+        '<line x1="100" y1="100" x2="100" y2="183" stroke-width="1.2" opacity="0.55"/>' +
+        '<line x1="100" y1="100" x2="58"  y2="172" stroke-width="1.2" opacity="0.55"/>' +
+        '<line x1="100" y1="100" x2="28"  y2="142" stroke-width="1.3" opacity="0.60"/>' +
+        '<line x1="100" y1="100" x2="17"  y2="100" stroke-width="1.3" opacity="0.60"/>' +
+        '<line x1="100" y1="100" x2="28"  y2="58"  stroke-width="1.3" opacity="0.60"/>' +
+        '<line x1="100" y1="100" x2="58"  y2="28"  stroke-width="1.4" opacity="0.65"/>' +
       '</g>' +
-      // Center dot
-      '<circle cx="60" cy="60" r="3" fill="rgba(120,200,120,0.3)" mask="url(#' + lid + '-m)"/>' +
+      // Centre navel
+      '<circle cx="100" cy="100" r="7"   fill="#6bd886" opacity="0.70"/>' +
+      '<circle cx="100" cy="100" r="2.8" fill="#b8f5c4" opacity="0.55"/>' +
+      // Specular highlight
+      '<ellipse cx="74" cy="60" rx="27" ry="16" fill="url(#' + lid + '-sh)" transform="rotate(-32 74 60)"/>' +
     '</svg>';
   }
 
@@ -581,10 +599,24 @@
     var goTitle = $('go-title');
     if (goTitle) goTitle.textContent = 'Out of Lives!';
 
+    var goIconEl = $('go-icon');
     if (reason === 'omission') {
-      $('go-icon').innerHTML = makeKoiSVG();
+      goIconEl.style.width    = '100%';
+      goIconEl.style.maxWidth = '460px';
+      goIconEl.style.flexWrap = 'wrap';
+      goIconEl.style.gap      = '4px';
+      var fishRotations = [-14, 3, -8];
+      var fishHtml = '';
+      for (var f = 0; f < 3; f++) {
+        fishHtml += '<div style="transform:rotate(' + fishRotations[f] + 'deg);">' + makeKoiSVG(148, 68) + '</div>';
+      }
+      goIconEl.innerHTML = fishHtml;
     } else {
-      $('go-icon').textContent = icons[reason] || '🐟';
+      goIconEl.style.width    = '';
+      goIconEl.style.maxWidth = '';
+      goIconEl.style.flexWrap = '';
+      goIconEl.style.gap      = '';
+      goIconEl.textContent = icons[reason] || '🐟';
     }
     $('go-reason').textContent = reasons[reason]  || '';
     $('go-sub').textContent    = subs[reason]     || '';
