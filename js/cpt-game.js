@@ -220,49 +220,33 @@
   // ─────────────────────────────────────────────────────────
   function makeLotusLeafSVG() {
     var lid = 'lotus' + Date.now() + Math.floor(Math.random() * 9999);
-    // High-quality lotus / lily-pad: proper arc path with V-notch, radial gradient, clipped veins
-    // Leaf shape: M center L notch-left A big-arc-cw notch-right Z  (viewBox 200×200, centre 100,100 r=83)
-    var leafPath = 'M 100 100 L 79 20 A 83 83 0 1 1 121 20 Z';
-    return '<svg viewBox="0 0 200 200" width="200" height="200" xmlns="http://www.w3.org/2000/svg">' +
+    // Lily-pad: circle with V-notch at top. Path: centre → left-notch → large-arc CW → right-notch → close
+    var leafPath = 'M 100 100 L 77 18 A 85 85 0 1 1 123 18 Z';
+    var veins = [
+      [100,15],[138,24],[166,52],[176,90],[166,138],[138,166],[100,175],[62,166],[34,138],[24,90],[34,52],[62,24]
+    ];
+    var veinLines = '';
+    for (var v = 0; v < veins.length; v++) {
+      veinLines += '<line x1="100" y1="100" x2="' + veins[v][0] + '" y2="' + veins[v][1] + '"/>';
+    }
+    return '<svg viewBox="0 0 200 200" width="180" height="180" xmlns="http://www.w3.org/2000/svg">' +
       '<defs>' +
-        '<radialGradient id="' + lid + '-g" cx="48%" cy="46%" r="54%">' +
-          '<stop offset="0%"   stop-color="#7ddc96"/>' +
-          '<stop offset="42%"  stop-color="#3da558"/>' +
-          '<stop offset="100%" stop-color="#1f6b32"/>' +
+        '<radialGradient id="' + lid + '-g" cx="50%" cy="55%" r="55%">' +
+          '<stop offset="0%"   stop-color="#62c97a"/>' +
+          '<stop offset="100%" stop-color="#1e7535"/>' +
         '</radialGradient>' +
-        '<radialGradient id="' + lid + '-sh" cx="38%" cy="33%" r="52%">' +
-          '<stop offset="0%"   stop-color="rgba(255,255,255,0.25)"/>' +
-          '<stop offset="100%" stop-color="rgba(255,255,255,0)"/>' +
-        '</radialGradient>' +
-        '<clipPath id="' + lid + '-c">' +
-          '<path d="' + leafPath + '"/>' +
-        '</clipPath>' +
+        '<clipPath id="' + lid + '-c"><path d="' + leafPath + '"/></clipPath>' +
       '</defs>' +
       // Drop shadow
-      '<ellipse cx="105" cy="109" rx="79" ry="79" fill="rgba(0,0,0,0.18)"/>' +
+      '<ellipse cx="104" cy="108" rx="82" ry="82" fill="rgba(0,0,0,0.15)"/>' +
       // Leaf body
-      '<path d="' + leafPath + '" fill="url(#' + lid + '-g)" stroke="#196228" stroke-width="1.8"/>' +
-      // Rim highlight
-      '<path d="M 79 20 A 83 83 0 1 1 121 20" fill="none" stroke="rgba(180,255,190,0.32)" stroke-width="3.5" stroke-linecap="round"/>' +
-      // Veins — clipped inside leaf, radiating from centre every ~30°
-      '<g clip-path="url(#' + lid + '-c)" stroke="#3a8849" stroke-linecap="round" fill="none">' +
-        '<line x1="100" y1="100" x2="142" y2="28"  stroke-width="1.4" opacity="0.65"/>' +
-        '<line x1="100" y1="100" x2="172" y2="58"  stroke-width="1.3" opacity="0.60"/>' +
-        '<line x1="100" y1="100" x2="183" y2="100" stroke-width="1.3" opacity="0.60"/>' +
-        '<line x1="100" y1="100" x2="172" y2="142" stroke-width="1.3" opacity="0.60"/>' +
-        '<line x1="100" y1="100" x2="142" y2="172" stroke-width="1.2" opacity="0.55"/>' +
-        '<line x1="100" y1="100" x2="100" y2="183" stroke-width="1.2" opacity="0.55"/>' +
-        '<line x1="100" y1="100" x2="58"  y2="172" stroke-width="1.2" opacity="0.55"/>' +
-        '<line x1="100" y1="100" x2="28"  y2="142" stroke-width="1.3" opacity="0.60"/>' +
-        '<line x1="100" y1="100" x2="17"  y2="100" stroke-width="1.3" opacity="0.60"/>' +
-        '<line x1="100" y1="100" x2="28"  y2="58"  stroke-width="1.3" opacity="0.60"/>' +
-        '<line x1="100" y1="100" x2="58"  y2="28"  stroke-width="1.4" opacity="0.65"/>' +
+      '<path d="' + leafPath + '" fill="url(#' + lid + '-g)" stroke="#155c22" stroke-width="2.5"/>' +
+      // Veins clipped inside leaf
+      '<g clip-path="url(#' + lid + '-c)" stroke="#4ab860" stroke-width="1.1" fill="none" opacity="0.50">' +
+        veinLines +
       '</g>' +
       // Centre navel
-      '<circle cx="100" cy="100" r="7"   fill="#6bd886" opacity="0.70"/>' +
-      '<circle cx="100" cy="100" r="2.8" fill="#b8f5c4" opacity="0.55"/>' +
-      // Specular highlight
-      '<ellipse cx="74" cy="60" rx="27" ry="16" fill="url(#' + lid + '-sh)" transform="rotate(-32 74 60)"/>' +
+      '<circle cx="100" cy="100" r="5" fill="rgba(140,255,160,0.45)" clip-path="url(#' + lid + '-c)"/>' +
     '</svg>';
   }
 
@@ -423,12 +407,10 @@
     }
   });
 
-  // Mobile tap button
-  var tapBtn = document.getElementById('cpt-tap-btn');
-  if (tapBtn) {
-    tapBtn.style.display = 'flex';
-    tapBtn.addEventListener('pointerdown', function(e) {
-      e.preventDefault();
+  // Tap anywhere on the game screen to scoop (mobile & desktop)
+  var elScreenGame = document.getElementById('screen-game');
+  if (elScreenGame) {
+    elScreenGame.addEventListener('pointerdown', function(e) {
       if (G.state !== 'ACTIVE' || G.pressed) return;
       G.pressed = true;
       if (G.isNoGo) { resolveFail('commission'); } else { resolveCatch(); }
@@ -601,21 +583,8 @@
 
     var goIconEl = $('go-icon');
     if (reason === 'omission') {
-      goIconEl.style.width    = '100%';
-      goIconEl.style.maxWidth = '460px';
-      goIconEl.style.flexWrap = 'wrap';
-      goIconEl.style.gap      = '4px';
-      var fishRotations = [-14, 3, -8];
-      var fishHtml = '';
-      for (var f = 0; f < 3; f++) {
-        fishHtml += '<div style="transform:rotate(' + fishRotations[f] + 'deg);">' + makeKoiSVG(148, 68) + '</div>';
-      }
-      goIconEl.innerHTML = fishHtml;
+      goIconEl.innerHTML = makeKoiSVG(200, 92);
     } else {
-      goIconEl.style.width    = '';
-      goIconEl.style.maxWidth = '';
-      goIconEl.style.flexWrap = '';
-      goIconEl.style.gap      = '';
       goIconEl.textContent = icons[reason] || '🐟';
     }
     $('go-reason').textContent = reasons[reason]  || '';
@@ -626,8 +595,6 @@
 
     clearSpawnZone();
     showScreen('screen-gameover');
-    var tapBtnEnd = document.getElementById('cpt-tap-btn');
-    if (tapBtnEnd) tapBtnEnd.style.display = 'none';
   }
 
   // ─────────────────────────────────────────────────────────

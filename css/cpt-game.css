@@ -953,6 +953,10 @@
 .key-badge {
   font-size: 0.78rem;
 }
+/* Hide spacebar prompt on touch/mobile devices */
+@media (hover: none) and (pointer: coarse) {
+  #spacebar-prompt { display: none; }
+}
 
 /* ── Mobile TAP button ──────────────────────────────────────── */
 .cpt-tap-btn {
