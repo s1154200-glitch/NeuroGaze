@@ -812,7 +812,6 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 /* Intro / gameover / levelup screens — allow natural scroll on mobile */
-#screen-intro,
 #screen-gameover,
 #screen-levelup {
   overflow-y: auto;
@@ -820,6 +819,15 @@
   align-items: flex-start;
   justify-content: flex-start;
   padding: 1.25rem 0 3rem;
+}
+
+/* Intro screen: short content, so centre it vertically on mobile */
+#screen-intro {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 0 2rem;
 }
 
 /* Intro card — no fixed max-height on mobile; full-width with breathing room */
