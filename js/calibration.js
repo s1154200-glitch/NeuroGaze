@@ -63,7 +63,10 @@ CalApp.activateDot = function (idx) {
   dom.instrBanner.style.opacity = (idx === 1) ? '0' : '1';
   dom.instrText.textContent =
     'Look at red dot ' + (idx + 1) + ' of ' + CalApp.POINTS.length +
-    ' \u2014 click it ' + CalApp.CLICKS_PER_POINT + ' times. Keep your head still.';
+    ' \u2014 ' +
+    (window.matchMedia('(pointer: coarse)').matches
+      ? 'tap anywhere ' : 'click it ') +
+    CalApp.CLICKS_PER_POINT + ' times. Keep your head still.';
 };
 
 /** Update the SVG progress ring and click-count label for a dot. */
@@ -174,6 +177,20 @@ CalApp.startCalibration = function () {
   }
 
   setTimeout(function () { CalApp.activateDot(0); }, 620);
+
+  // On touch devices: tap anywhere on the calibration screen to register a click on the current dot
+  if (!CalApp._tapAnywhere) {
+    CalApp._tapAnywhere = function (e) {
+      // Only fire on touch; ignore if the tap target is the dot button itself (it has its own listener)
+      if (e.pointerType === 'mouse') return;
+      var s = CalApp.state;
+      if (s.currentIdx < CalApp.POINTS.length) {
+        CalApp.handleDotClick(s.currentIdx);
+      }
+    };
+    var calScreen = CalApp.dom.screens.calibration;
+    calScreen.addEventListener('pointerdown', CalApp._tapAnywhere);
+  }
 };
 
 CalApp.finishCalibration = function () {
