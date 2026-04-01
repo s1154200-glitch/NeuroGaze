@@ -220,17 +220,23 @@
   // ─────────────────────────────────────────────────────────
   function makeLotusLeafSVG() {
     var lid = 'lotus' + Date.now() + Math.floor(Math.random() * 9999);
-    // Sharp, crisp leaf with notch using even-odd fill instead of mask to avoid mobile blurring.
-    var leafPath = 'M60 12 A48 48 0 1 1 59.999 12 Z M52 8 Q60 2 68 8 L60 60 Z';
+    var cx = 60, cy = 60, r = 48;
+    // Compute the angles of the two notch edges (lines from center to original notch points)
+    var a0 = Math.atan2(8 - cy, 52 - cx); // left notch edge  ≈ -98.7°
+    var a1 = Math.atan2(8 - cy, 68 - cx); // right notch edge ≈ -81.3°
+    // Polygon: start at center, trace the large arc clockwise from right-notch to left-notch, close
+    var span = (a0 + 2 * Math.PI) - a1;   // ≈342° — the leaf portion
+    var d = 'M ' + cx + ' ' + cy;
+    for (var i = 0; i <= 64; i++) {
+      var a = a1 + (i / 64) * span;
+      d += ' L ' + (cx + r * Math.cos(a)).toFixed(1) + ' ' + (cy + r * Math.sin(a)).toFixed(1);
+    }
+    d += ' Z';
     return '<svg viewBox="0 0 120 120" width="180" height="180" xmlns="http://www.w3.org/2000/svg">' +
-      // Shadow
+      '<defs><clipPath id="' + lid + '-c"><path d="' + d + '"/></clipPath></defs>' +
       '<circle cx="64" cy="64" r="48" fill="rgba(0,0,0,0.1)"/>' +
-      // Leaf body with notch
-      '<path d="' + leafPath + '" fill="#3a9d50" stroke="#2e8040" stroke-width="1" fill-rule="evenodd"/>' +
-      // Inner ring
-      '<circle cx="60" cy="60" r="40" fill="none" stroke="rgba(120,220,120,0.15)" stroke-width="1"/>' +
-      // Veins clipped by circle (no notch clipping required for veins)
-      '<defs><clipPath id="' + lid + '-c"><circle cx="60" cy="60" r="48"/></clipPath></defs>' +
+      '<path d="' + d + '" fill="#3a9d50" stroke="#2e8040" stroke-width="1"/>' +
+      '<circle cx="60" cy="60" r="40" fill="none" stroke="rgba(120,220,120,0.15)" stroke-width="1" clip-path="url(#' + lid + '-c)"/>' +
       '<g clip-path="url(#' + lid + '-c)" opacity="0.35">' +
         '<line x1="60" y1="60" x2="60" y2="14" stroke="#6abf6a" stroke-width="1"/>' +
         '<line x1="60" y1="60" x2="26" y2="32" stroke="#6abf6a" stroke-width="0.8"/>' +
