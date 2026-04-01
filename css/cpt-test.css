@@ -688,3 +688,166 @@
     -webkit-overflow-scrolling: touch;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE-FIRST OVERRIDES  (appended — these win via cascade)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Intro screen — scrollable, not clipped on mobile */
+#cpt-intro-screen {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  align-items: flex-start;
+  padding: 1.25rem 0 3rem;
+}
+
+/* Intro card — no max-height on mobile; full viewport width */
+.cpt-intro-card {
+  max-width: calc(100vw - 1.5rem);
+  width: 100%;
+  max-height: none;
+  padding: 1.25rem 1rem;
+  margin: 0 auto;
+}
+
+/* Info grids — single column on mobile */
+.cpt-info-grid {
+  grid-template-columns: 1fr !important;
+}
+
+/* Results screen — scrollable */
+#cpt-results-screen {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Results content wrapper: full width on mobile */
+.cpt-results-wrap {
+  max-width: 100%;
+  padding: 1.25rem 1rem 3rem;
+}
+
+/* Result cards grid — single column on mobile */
+.cpt-cards-grid {
+  grid-template-columns: 1fr !important;
+}
+
+/* HUD metrics — compact grid on mobile */
+.cpt-hud-metrics {
+  gap: 0.5rem;
+}
+
+/* Intro buttons — stack vertically */
+.cpt-intro-btns {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+.cpt-intro-btns .btn,
+.cpt-intro-btns a.btn {
+  width: 100%;
+  min-height: 52px;
+  font-size: 1rem;
+  text-align: center;
+  justify-content: center;
+}
+
+/* Key badge more readable on mobile */
+.key-badge {
+  font-size: 0.8rem;
+}
+
+/* ── min-width: 640px (tablet+): restore multi-column ─────── */
+@media (min-width: 640px) {
+  #cpt-intro-screen {
+    align-items: center;
+    padding: 1.75rem 1.25rem 3rem;
+  }
+
+  .cpt-intro-card {
+    max-width: 650px;
+    width: auto;
+    max-height: none;
+    padding: 1.625rem 1.75rem 1.375rem;
+  }
+
+  .cpt-info-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .cpt-cards-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .cpt-intro-btns {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .cpt-intro-btns .btn,
+  .cpt-intro-btns a.btn {
+    width: auto;
+    min-width: 140px;
+    flex: 1;
+  }
+}
+
+/* CPT-specific: halves grid, cards grid */
+.cpt-halves-grid {
+  grid-template-columns: 1fr !important;
+}
+@media (min-width: 640px) {
+  .cpt-halves-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* CPT instruction p elements — better touch/readability */
+.cpt-instructions p {
+  font-size: 0.88rem;
+}
+
+/* CPT live HUD compact on mobile */
+#cpt-live-hud {
+  padding: 0.5rem 0.75rem;
+  gap: 0.5rem;
+}
+
+/* ── Mobile TAP button ──────────────────────────────────────── */
+.cpt-tap-btn {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 150;
+  width: min(220px, 60vw);
+  min-height: 72px;
+  background: linear-gradient(135deg, #059669, #34d399);
+  border: none;
+  border-radius: 50px;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(52,211,153,0.45), 0 0 0 0 rgba(52,211,153,0.4);
+  animation: cpt-tap-pulse 2s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.cpt-tap-btn:active {
+  transform: translateX(-50%) scale(0.94);
+  box-shadow: 0 4px 16px rgba(52,211,153,0.4);
+  animation: none;
+}
+@keyframes cpt-tap-pulse {
+  0%, 100% { box-shadow: 0 8px 32px rgba(52,211,153,0.45), 0 0 0 0 rgba(52,211,153,0.4); }
+  50%       { box-shadow: 0 8px 32px rgba(52,211,153,0.45), 0 0 0 14px rgba(52,211,153,0); }
+}
+@media (hover: none) and (pointer: coarse) {
+  .cpt-tap-btn { display: flex; }
+}

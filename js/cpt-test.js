@@ -504,10 +504,8 @@ function cptRunCountdown(cb) {
 
 // ── Spacebar listener ─────────────────────────────────────────────────────
 
-function cptOnSpacebar(e) {
-  if (e.code !== 'Space' && e.keyCode !== 32) return;
-  e.preventDefault();
-
+// Core response handler — shared by keyboard AND tap button
+function cptHandleResponse() {
   if (!CPT.taskRunning) return;
   if (CPT.pressedThisTrial) return;  // no double-count
 
@@ -515,14 +513,10 @@ function cptOnSpacebar(e) {
   CPT.pressRT = performance.now() - CPT.stimOnsetTime;
 
   if (CPT.isNoGo) {
-    // Commission error — pressed on X
     cptShowFeedback('commission');
   } else if (CPTdom.letter && CPTdom.letter.classList.contains('visible')) {
-    // Correct Go response — letter still visible
     cptShowFeedback('correct');
   } else {
-    // Pressed during blank gap after a Go letter (still credited as Go response,
-    // but RT is measured from stimulus onset so it will be longer)
     cptShowFeedback('correct');
   }
 
@@ -531,6 +525,12 @@ function cptOnSpacebar(e) {
   rip.classList.remove('fire', 'fire-error');
   void rip.offsetWidth;  // reflow
   rip.classList.add(CPT.isNoGo ? 'fire-error' : 'fire');
+}
+
+function cptOnSpacebar(e) {
+  if (e.code !== 'Space' && e.keyCode !== 32) return;
+  e.preventDefault();
+  cptHandleResponse();
 }
 
 // ── Gaze listener during task ─────────────────────────────────────────────
@@ -625,6 +625,16 @@ function cptStartTask() {
     CPTdom.liveHud.style.display = 'flex';
     cptInstallTaskGazeListener();
     document.addEventListener('keydown', cptOnSpacebar);
+
+    // Mobile tap button
+    var tapBtn = document.getElementById('cpt-tap-btn');
+    if (tapBtn) {
+      tapBtn.style.display = 'flex';
+      tapBtn.addEventListener('pointerdown', function(e) {
+        e.preventDefault();
+        cptHandleResponse();
+      });
+    }
 
     cptUpdateHud();
     cptRunTrial();
@@ -833,6 +843,9 @@ function cptFinishTask() {
   CPTdom.letter.classList.remove('visible');
   CPTdom.liveHud.style.display = 'none';
   CPTdom.gazeVignette.classList.remove('active');
+
+  var tapBtn = document.getElementById('cpt-tap-btn');
+  if (tapBtn) tapBtn.style.display = 'none';
   CPTdom.feedback.className = 'cpt-feedback';
 
   CalApp.stopFaceMonitoring();

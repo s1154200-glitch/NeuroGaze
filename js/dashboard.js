@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (backdrop) backdrop.classList.remove('visible');
   }
 
+  // Auto-expand on desktop where sidebar is always in-flow
+  if (window.matchMedia('(min-width: 1024px)').matches) {
+    sidebar.classList.add('expanded');
+  }
+
   hamburger.addEventListener('click', function () {
     sidebar.classList.toggle('expanded');
     if (backdrop) backdrop.classList.toggle('visible', sidebar.classList.contains('expanded'));

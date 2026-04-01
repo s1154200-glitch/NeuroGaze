@@ -399,13 +399,23 @@
     G.pressed = true;
 
     if (G.isNoGo) {
-      // Pressed on lotus = commission error
       resolveFail('commission');
     } else {
-      // Correct catch!
       resolveCatch();
     }
   });
+
+  // Mobile tap button
+  var tapBtn = document.getElementById('cpt-tap-btn');
+  if (tapBtn) {
+    tapBtn.style.display = 'flex';
+    tapBtn.addEventListener('pointerdown', function(e) {
+      e.preventDefault();
+      if (G.state !== 'ACTIVE' || G.pressed) return;
+      G.pressed = true;
+      if (G.isNoGo) { resolveFail('commission'); } else { resolveCatch(); }
+    });
+  }
 
   // ─────────────────────────────────────────────────────────
   //  RESOLVE: SUCCESSFUL CATCH
@@ -584,6 +594,8 @@
 
     clearSpawnZone();
     showScreen('screen-gameover');
+    var tapBtnEnd = document.getElementById('cpt-tap-btn');
+    if (tapBtnEnd) tapBtnEnd.style.display = 'none';
   }
 
   // ─────────────────────────────────────────────────────────

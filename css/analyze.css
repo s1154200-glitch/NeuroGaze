@@ -112,3 +112,38 @@
       .dash-grid { overflow-y: auto; }
       .az-metrics { grid-template-columns: 1fr 1fr; }
     }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE-FIRST OVERRIDES for analyze.css
+   ═══════════════════════════════════════════════════════════════════ */
+
+.main {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dash-grid {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 1rem;
+  gap: 0.875rem;
+}
+
+canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+.analysis-grid,
+.trend-grid,
+.session-grid {
+  grid-template-columns: 1fr !important;
+}
+
+@media (min-width: 768px) {
+  .dash-grid {
+    padding: 1.375rem;
+    gap: 1.125rem;
+  }
+}

@@ -497,6 +497,10 @@
       if (backdrop) backdrop.classList.remove('visible');
     }
 
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      sidebar.classList.add('expanded');
+    }
+
     if (hamburger) hamburger.addEventListener('click', function () {
       sidebar.classList.toggle('expanded');
       if (backdrop) backdrop.classList.toggle('visible', sidebar.classList.contains('expanded'));

@@ -752,3 +752,107 @@
     -webkit-overflow-scrolling: touch;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE-FIRST OVERRIDES  (appended — these win via cascade)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Intro screen — scrollable, not clipped on mobile */
+#ast-intro-screen {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  align-items: flex-start;
+  padding: 1.25rem 0 3rem;
+}
+
+/* Intro card — no max-height on mobile; full viewport width */
+.ast-intro-card {
+  max-width: calc(100vw - 1.5rem);
+  width: 100%;
+  max-height: none;
+  padding: 1.25rem 1rem;
+  margin: 0 auto;
+}
+
+/* Info grids — single column on mobile */
+.ast-info-grid {
+  grid-template-columns: 1fr !important;
+}
+
+/* Results screen — scrollable */
+#ast-results-screen {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Results content wrapper: full width on mobile */
+.ast-results-wrap {
+  max-width: 100%;
+  padding: 1.25rem 1rem 3rem;
+}
+
+/* Result cards grid — single column on mobile */
+.ast-cards-grid {
+  grid-template-columns: 1fr !important;
+}
+
+/* HUD metrics — compact grid on mobile */
+.ast-hud-metrics {
+  gap: 0.5rem;
+}
+
+/* Intro buttons — stack vertically */
+.ast-intro-btns {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+.ast-intro-btns .btn,
+.ast-intro-btns a.btn {
+  width: 100%;
+  min-height: 52px;
+  font-size: 1rem;
+  text-align: center;
+  justify-content: center;
+}
+
+/* Key badge more readable on mobile */
+.key-badge {
+  font-size: 0.8rem;
+}
+
+/* ── min-width: 640px (tablet+): restore multi-column ─────── */
+@media (min-width: 640px) {
+  #ast-intro-screen {
+    align-items: center;
+    padding: 1.75rem 1.25rem 3rem;
+  }
+
+  .ast-intro-card {
+    max-width: 650px;
+    width: auto;
+    max-height: none;
+    padding: 1.625rem 1.75rem 1.375rem;
+  }
+
+  .ast-info-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .ast-cards-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .ast-intro-btns {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .ast-intro-btns .btn,
+  .ast-intro-btns a.btn {
+    width: auto;
+    min-width: 140px;
+    flex: 1;
+  }
+}

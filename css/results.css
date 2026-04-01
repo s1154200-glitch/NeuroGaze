@@ -309,3 +309,55 @@
       .main { overflow-y: auto; -webkit-overflow-scrolling: touch; }
       .dash-grid { overflow-y: auto; }
     }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE-FIRST OVERRIDES for results.css
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Main content area scrolls naturally on mobile */
+.main {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dash-grid {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 1rem;
+  gap: 0.875rem;
+}
+
+/* Result panels — full width on mobile */
+.results-panel,
+.result-card,
+.results-wrap {
+  max-width: 100%;
+  padding: 1rem;
+}
+
+/* Charts / canvases should not overflow */
+canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+/* Multi-column result grids collapse on mobile */
+.results-grid,
+.bio-grid,
+.results-cols {
+  grid-template-columns: 1fr !important;
+  flex-direction: column;
+}
+
+/* ── min-width: 768px (tablet+) ───────────────────────────── */
+@media (min-width: 768px) {
+  .dash-grid {
+    padding: 1.375rem;
+    gap: 1.125rem;
+  }
+  .results-panel,
+  .result-card {
+    padding: 1.5rem;
+  }
+}
