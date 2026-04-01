@@ -804,7 +804,7 @@
   #screen-intro, #screen-gameover, #screen-levelup {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    align-items: flex-start;
+    align-items: center;
     padding: 20px 0 40px;
   }
   .go-card, .levelup-card {
@@ -827,18 +827,10 @@
    Base = mobile default; min-width queries restore desktop behaviour
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Gameover / levelup screens — scrollable, horizontally centred */
+/* Intro / gameover / levelup screens — allow natural scroll on mobile */
+#screen-intro,
 #screen-gameover,
 #screen-levelup {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 1.25rem 0 3rem;
-}
-
-/* Intro screen — short content, fully centred on mobile */
-#screen-intro {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   align-items: center;

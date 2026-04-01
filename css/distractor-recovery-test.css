@@ -603,7 +603,7 @@
 #dr-intro-screen {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   padding: 1.25rem 0 3rem;
 }

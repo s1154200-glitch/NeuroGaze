@@ -784,7 +784,7 @@ html, body {
   #intro-screen {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    align-items: flex-start;
+    align-items: center;
     padding: 16px 0 32px;
   }
   .welcome-card {
@@ -803,9 +803,9 @@ html, body {
 .screen {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 1.25rem 0 3rem;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 0 2rem;
 }
 
 /* Tablet+: restore centered layout */
