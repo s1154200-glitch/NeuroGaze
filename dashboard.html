@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroGaze — ADHD Eye-Tracking Dashboard</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       Sidebar
+       ============================================================ -->
+  <aside class="sidebar expanded" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <svg viewBox="0 0 40 40" width="36" height="36" fill="none">
+          <circle cx="20" cy="20" r="18" stroke="#7c5cfc" stroke-width="2.5"/>
+          <circle cx="20" cy="20" r="10" stroke="#7c5cfc" stroke-width="1.5" opacity="0.6"/>
+          <circle cx="20" cy="20" r="4"  fill="#7c5cfc"/>
+        </svg>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-page="dashboard" title="Dashboard">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-page="calibration" title="Calibration" onclick="location.href='calibration.html'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+          </svg>
+          <span>Calibration</span>
+        </button>
+        <div class="nav-group" id="nav-group-tests">
+          <button class="nav-item nav-dropdown-toggle" data-page="tests" id="nav-tests" title="ADHD Tests">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+              <rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/>
+            </svg>
+            <span>ADHD Tests</span>
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="nav-submenu" id="nav-submenu-tests">
+            <a class="nav-subitem nav-subitem-ready" href="fixation-stability-test.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+              Fixation Stability
+            </a>
+            <a class="nav-subitem nav-subitem-ready" href="antisaccade-test.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              Antisaccade Test
+            </a>
+            <a class="nav-subitem nav-subitem-ready" href="cpt-test.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              CPT
+            </a>
+            <a class="nav-subitem nav-subitem-ready" href="distractor-recovery-test.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-5"/></svg>
+              Distractor Recovery
+            </a>
+          </div>
+        </div>
+        <div class="nav-group" id="nav-group-trains">
+          <button class="nav-item nav-dropdown-toggle" data-page="trains" id="nav-trains" title="ADHD Trains">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 12h12"/>
+              <path d="M6 8v8"/>
+              <path d="M18 8v8"/>
+              <path d="M3 10v4"/>
+              <path d="M21 10v4"/>
+            </svg>
+            <span>ADHD Trains</span>
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="nav-submenu" id="nav-submenu-tests">
+            <a class="nav-subitem nav-subitem-ready" href="fixation-stability-game.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+              Fixation Stability
+            </a>
+            <a class="nav-subitem nav-subitem-ready" href="antisaccade-game.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              Antisaccade Test
+            </a>
+            <a class="nav-subitem nav-subitem-ready" href="cpt-game.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              CPT
+            </a>
+            <a class="nav-subitem nav-subitem-ready" href="distractor-recovery-game.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-5"/></svg>
+              Distractor Recovery
+            </a>
+          </div>
+        </div>
+        <button class="nav-item" data-page="results" title="Results" onclick="location.href='results.html'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+            <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+          </svg>
+          <span>Results</span>
+        </button>
+        <button class="nav-item" data-page="analyze" title="Analysis" onclick="location.href='analyze.html'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 21H4a1 1 0 0 1-1-1V3"/><path d="m7 14 4-4 4 4 6-6"/>
+          </svg>
+          <span>Analysis</span>
+        </button>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- ============================================================
+       Main Content
+       ============================================================ -->
+  <main class="main">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h1 class="page-title">NeuroGaze</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-pill">
+          <span class="pill-dot"></span>
+          Calibration: <strong id="cal-status">Not Done</strong>
+        </div>
+        <div class="topbar-pill">Date: <strong id="dash-date">—</strong></div>
+      </div>
+    </header>
+
+    <!-- ── Dashboard grid ──────────────────────────────────────── -->
+    <section class="dash-grid">
+
+      <!-- Card: Calibration -->
+      <div class="card card-calibration" onclick="location.href='calibration.html'">
+        <div class="card-header">
+          <span class="card-label">CALIBRATION</span>
+          <span class="card-badge badge-action">Required</span>
+        </div>
+        <div class="cal-hero">
+          <div class="cal-eye-icon">
+            <svg viewBox="0 0 80 80" width="72" height="72" fill="none">
+              <circle cx="40" cy="40" r="32" stroke="rgba(124,92,252,0.35)" stroke-width="3"/>
+              <circle cx="40" cy="40" r="20" stroke="rgba(124,92,252,0.55)" stroke-width="2"/>
+              <circle cx="40" cy="40" r="8"  fill="#7c5cfc"/>
+              <line x1="40" y1="4"  x2="40" y2="16" stroke="#7c5cfc" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+              <line x1="40" y1="64" x2="40" y2="76" stroke="#7c5cfc" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+              <line x1="4"  y1="40" x2="16" y2="40" stroke="#7c5cfc" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+              <line x1="64" y1="40" x2="76" y2="40" stroke="#7c5cfc" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+            </svg>
+          </div>
+          <div class="cal-info">
+            <h3>9-Point Gaze Calibration</h3>
+            <p>Calibrate your eye-tracking before running any ADHD tests. Accuracy determines test reliability.</p>
+          </div>
+        </div>
+        <div class="cal-stats-row">
+          <div class="cal-stat">
+            <div class="cal-stat-lbl">Accuracy</div>
+            <div class="cal-stat-val" id="cal-accuracy-val">—</div>
+          </div>
+          <div class="cal-stat">
+            <div class="cal-stat-lbl">Last Run</div>
+            <div class="cal-stat-val" id="cal-last-run">Never</div>
+          </div>
+          <div class="cal-stat">
+            <div class="cal-stat-lbl">Status</div>
+            <div class="cal-stat-val cal-stat-status" id="cal-status-val">Pending</div>
+          </div>
+        </div>
+        <div class="card-action">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          Start Calibration
+        </div>
+        <button class="cal-del-btn" id="btn-del-cal" title="Delete calibration data" onclick="event.stopPropagation();if(confirm('Delete all calibration data? This cannot be undone.')){localStorage.removeItem('neurogaze_cal_done');localStorage.removeItem('neurogaze_cal_accuracy');localStorage.removeItem('neurogaze_cal_time');location.reload();}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          Delete Calibration Data
+        </button>
+      </div>
+
+      <!-- Card: ADHD Test Suite -->
+      <div class="card card-tests">
+        <div class="card-header">
+          <span class="card-label">ADHD TEST BATTERY</span>
+          <span class="card-badge badge-count">4 Tests</span>
+        </div>
+        <div class="tests-hero">
+          <div class="tests-hero-icon">
+            <svg viewBox="0 0 80 80" width="72" height="72" fill="none">
+              <circle cx="40" cy="40" r="32" stroke="rgba(124,92,252,0.35)" stroke-width="3"/>
+              <!-- clipboard body -->
+              <rect x="26" y="22" width="28" height="36" rx="5" stroke="#7c5cfc" stroke-width="2" opacity="0.7"/>
+              <!-- clipboard clip -->
+              <rect x="33" y="18" width="14" height="9" rx="3" stroke="#7c5cfc" stroke-width="1.8" opacity="0.5"/>
+              <!-- check row 1 -->
+              <path d="M32 34 l3 3 5-6" stroke="#7c5cfc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- check row 2 -->
+              <path d="M32 44 l3 3 5-6" stroke="#7c5cfc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+              <!-- line row 3 -->
+              <line x1="32" y1="53" x2="48" y2="53" stroke="#7c5cfc" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+            </svg>
+          </div>
+          <div class="tests-hero-info">
+            <h3>ADHD Test Battery</h3>
+            <p>Comprehensive eye-tracking assessments measuring inhibitory control, sustained attention, and gaze stability.</p>
+          </div>
+        </div>
+
+        <!-- Fixation Stability Test -->
+        <a href="fixation-stability-test.html" class="test-item test-ready" id="test-fixation">
+          <div class="test-icon test-icon-fixation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
+            </svg>
+          </div>
+          <div class="test-info">
+            <div class="test-name">Fixation Stability Test</div>
+            <div class="test-meta">BCEA · Saccade Detection · 30 sec</div>
+          </div>
+          <span id="badge-fixation" class="test-status-badge status-not-completed">Not Completed</span>
+          <svg class="test-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+
+        <!-- Antisaccade Test -->
+        <a class="test-item test-ready" id="test-antisaccade" href="antisaccade-test.html" style="text-decoration:none">
+          <div class="test-icon test-icon-anti">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div class="test-info">
+            <div class="test-name">Antisaccade Test</div>
+            <div class="test-meta">Inhibitory control · ~3 min</div>
+          </div>
+          <span id="badge-antisaccade" class="test-status-badge status-not-completed">Not Completed</span>
+          <svg class="test-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+
+        <!-- Continuous Performance Test -->
+        <a class="test-item test-ready" id="test-cpt" href="cpt-test.html">
+          <div class="test-icon test-icon-cpt">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <div class="test-info">
+            <div class="test-name">Continuous Performance Test (CPT)</div>
+            <div class="test-meta">Sustained attention · ~5 min</div>
+          </div>
+          <span id="badge-cpt" class="test-status-badge status-not-completed">Not Completed</span>
+          <svg class="test-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+
+        <!-- Distractor Recovery Test -->
+        <a class="test-item test-ready" id="test-distractor" href="distractor-recovery-test.html" style="text-decoration:none">
+          <div class="test-icon test-icon-dist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-5"/>
+            </svg>
+          </div>
+          <div class="test-info">
+            <div class="test-name">Distractor Recovery Test</div>
+            <div class="test-meta">GRL · Capture Rate · ~2 min</div>
+          </div>
+          <span id="badge-distractor" class="test-status-badge status-not-completed">Not Completed</span>
+          <svg class="test-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+
+        <!-- Results -->
+        <a class="test-item test-ready test-result" id="test-results" href="results.html" style="text-decoration:none">
+          <div class="test-icon test-icon-results">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+            </svg>
+          </div>
+          <div class="test-info">
+            <div class="test-name">Results</div>
+            <div class="test-meta">View all test results &amp; history</div>
+          </div>
+          <svg class="test-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+        
+      </div>
+      <div class="card card-stats">
+        <div class="card-header">
+          <span class="card-label">OVERVIEW ADHD PROB</span>
+        </div>
+        <div class="stat-tiles">
+          <div class="stat-tile">
+            <div class="st-lbl">Fixation Stability</div>
+            <div class="st-val" id="ov-fix-prob">—</div>
+          </div>
+          <div class="stat-tile">
+            <div class="st-lbl">Antisaccade</div>
+            <div class="st-val" id="ov-ast-prob">—</div>
+          </div>
+          <div class="stat-tile">
+            <div class="st-lbl">CPT</div>
+            <div class="st-val" id="ov-cpt-prob">—</div>
+          </div>
+          <div class="stat-tile">
+            <div class="st-lbl">Distractor Rec.</div>
+            <div class="st-val" id="ov-dr-prob">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Test Timeline / Results -->
+      <div class="card card-timeline">
+        <div class="card-header">
+          <span class="card-label">RECENT RESULTS</span>
+        </div>
+        <div class="timeline-body" id="timeline-body">
+          <div class="timeline-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" stroke-linecap="round">
+              <rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18"/><path d="M9 21V9"/>
+            </svg>
+            <p>No test results yet. Run a test to see your history here.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Biomarker Reference -->
+      <div class="card card-reference">
+        <div class="card-header">
+          <span class="card-label">BIOMARKER THRESHOLDS</span>
+        </div>
+        <div class="bio-grid">
+          <div class="bio-item">
+            <div class="bio-top">
+              <span class="bio-name">BCEA</span><span class="bio-src">Fixation</span>
+              <span class="bio-val" id="bio-bcea-val">No data</span>
+            </div>
+            <div class="zone-bar-wrap">
+              <div class="zone-bar"><div class="zone-td" style="flex:30"></div><div class="zone-border" style="flex:30"></div><div class="zone-adhd" style="flex:40"></div></div>
+              <div class="zone-marker" id="bio-bcea-marker" style="display:none"></div>
+            </div>
+            <div class="bio-thr"><span class="bio-t-td">&lt; 1.5°²</span><span class="bio-t-mid">1.5 – 3.0°²</span><span class="bio-t-adhd">&gt; 3.0°²</span></div>
+          </div>
+          <div class="bio-item">
+            <div class="bio-top">
+              <span class="bio-name">Error Rate</span><span class="bio-src">Antisaccade</span>
+              <span class="bio-val" id="bio-err-val">No data</span>
+            </div>
+            <div class="zone-bar-wrap">
+              <div class="zone-bar"><div class="zone-td" style="flex:20"></div><div class="zone-border" style="flex:20"></div><div class="zone-adhd" style="flex:60"></div></div>
+              <div class="zone-marker" id="bio-err-marker" style="display:none"></div>
+            </div>
+            <div class="bio-thr"><span class="bio-t-td">&lt; 20%</span><span class="bio-t-mid">20 – 40%</span><span class="bio-t-adhd">&gt; 40%</span></div>
+          </div>
+          <div class="bio-item">
+            <div class="bio-top">
+              <span class="bio-name">Commission</span><span class="bio-src">CPT</span>
+              <span class="bio-val" id="bio-cpt-val">No data</span>
+            </div>
+            <div class="zone-bar-wrap">
+              <div class="zone-bar"><div class="zone-td" style="flex:15"></div><div class="zone-border" style="flex:15"></div><div class="zone-adhd" style="flex:70"></div></div>
+              <div class="zone-marker" id="bio-cpt-marker" style="display:none"></div>
+            </div>
+            <div class="bio-thr"><span class="bio-t-td">&lt; 15%</span><span class="bio-t-mid">15 – 30%</span><span class="bio-t-adhd">&gt; 30%</span></div>
+          </div>
+          <div class="bio-item">
+            <div class="bio-top">
+              <span class="bio-name">Gaze Latency</span><span class="bio-src">Distractor</span>
+              <span class="bio-val" id="bio-grl-val">No data</span>
+            </div>
+            <div class="zone-bar-wrap">
+              <div class="zone-bar"><div class="zone-td" style="flex:40"></div><div class="zone-border" style="flex:30"></div><div class="zone-adhd" style="flex:30"></div></div>
+              <div class="zone-marker" id="bio-grl-marker" style="display:none"></div>
+            </div>
+            <div class="bio-thr"><span class="bio-t-td">&lt; 400ms</span><span class="bio-t-mid">400 – 700ms</span><span class="bio-t-adhd">&gt; 700ms</span></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

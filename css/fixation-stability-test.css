@@ -1,0 +1,742 @@
+/* ============================================================
+   adhd-test.css — Fixation Stability Test UI styles
+   ============================================================ */
+
+/* ── Intro card ─────────────────────────────────────────────── */
+/* ── Intro card ────────────────────────────── */
+.adhd-intro-card {
+  text-align: center;
+  max-width: 560px;
+  padding: 26px 28px 22px;
+  background: linear-gradient(145deg, #0e0e24, #141430);
+  border: 1px solid rgba(124,92,252,0.18);
+  border-radius: 16px;
+  box-shadow: 0 30px 90px rgba(0,0,0,0.65),
+              0 0 80px rgba(124,92,252,0.06);
+  overflow-y: auto;
+  max-height: 95vh;
+  width: auto;
+}
+
+.adhd-logo {
+  margin-bottom: 8px;
+}
+
+.adhd-intro-card h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+  background: linear-gradient(135deg, #a78bfa 0%, #7c5cfc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.adhd-subtitle {
+  font-size: 0.82rem;
+  color: #555;
+  margin-bottom: 16px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.adhd-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.adhd-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(124,92,252,0.06);
+  border: 1px solid rgba(124,92,252,0.12);
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.adhd-info-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.adhd-info-text {
+  font-size: 0.78rem;
+  color: #999;
+  line-height: 1.4;
+}
+.adhd-info-text strong {
+  display: block;
+  color: #ccc;
+  font-size: 0.88rem;
+  margin-bottom: 2px;
+}
+
+.adhd-instructions {
+  text-align: left;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.adhd-instructions p {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: #bbb;
+  margin-bottom: 8px;
+}
+.adhd-instructions p:last-child { margin-bottom: 0; }
+
+.step-num {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.68rem; font-weight: 800; color: #fff;
+  background: linear-gradient(135deg, #7c5cfc, #a78bfa);
+  border-radius: 50%;
+}
+
+.adhd-disclaimer {
+  font-size: 0.74rem;
+  color: #555;
+  background: rgba(255,204,0,0.06);
+  border: 1px solid rgba(255,204,0,0.14);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.adhd-disclaimer strong { color: #aa8800; }
+
+.adhd-intro-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-adhd {
+  background: linear-gradient(135deg, #7c5cfc, #a78bfa);
+  box-shadow: 0 6px 30px rgba(124,92,252,0.38);
+  padding: 14px 38px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.btn-adhd:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(124,92,252,0.54);
+}
+
+/* ── Task screen ─────────────────────────────────────────────── */
+#adhd-task-screen {
+  background: #060612;
+}
+
+/* Scatter canvas behind everything */
+#adhd-scatter-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+/* Countdown */
+.adhd-countdown {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  gap: 14px;
+}
+
+.countdown-ring {
+  position: relative;
+  width: 160px; height: 160px;
+}
+.countdown-num {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  font-weight: 900;
+  color: #a78bfa;
+  line-height: 1;
+}
+.countdown-label {
+  font-size: 1rem;
+  color: #555;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Fixation target */
+.adhd-target {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px; height: 80px;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10;
+}
+
+.target-outer-ring {
+  position: absolute;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 2px solid rgba(124,92,252,0.2);
+  animation: target-pulse 3s ease-in-out infinite;
+}
+.target-mid-ring {
+  position: absolute;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 2px solid rgba(124,92,252,0.35);
+}
+.target-center {
+  position: absolute;
+  width: 12px; height: 12px;
+  background: #7c5cfc;
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(124,92,252,0.8), 0 0 28px rgba(124,92,252,0.3);
+}
+.target-crosshair-h,
+.target-crosshair-v {
+  position: absolute;
+  background: rgba(124,92,252,0.5);
+  border-radius: 2px;
+}
+.target-crosshair-h { width: 72px; height: 1px; }
+.target-crosshair-v { width: 1px; height: 72px; }
+
+@keyframes target-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.06); }
+}
+
+/* Live HUD */
+.adhd-live-hud {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  background: rgba(6,6,18,0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(124,92,252,0.18);
+  border-radius: 18px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.hud-timer-wrap {
+  position: relative;
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.hud-timer-svg {
+  position: absolute;
+  top: 0; left: 0;
+}
+.hud-timer-text {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #a78bfa;
+  position: relative;
+  z-index: 1;
+}
+
+.hud-metrics {
+  display: flex;
+  gap: 14px;
+}
+.hud-metric {
+  text-align: center;
+}
+.hud-metric-lbl {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #444;
+  margin-bottom: 2px;
+}
+.hud-metric-val {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #ccc;
+}
+.hud-metric-val.stability-good { color: #4cd964; }
+.hud-metric-val.stability-warn { color: #ffcc00; }
+.hud-metric-val.stability-bad  { color: #ff3b30; }
+
+/* SWJ alert flash */
+.adhd-swj-alert {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  background: rgba(255,59,48,0.9);
+  color: #fff;
+  padding: 8px 22px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.adhd-swj-alert.active { opacity: 1; }
+
+/* ── Results screen ──────────────────────────────────────────── */
+#adhd-results-screen {
+  background: #060612;
+  overflow-y: auto;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.adhd-results-wrap {
+  width: 100%;
+  max-width: 880px;
+  padding: 32px 24px 48px;
+  margin: 0 auto;
+}
+
+.results-header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+.results-header h2 {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #e0e0e0;
+  letter-spacing: -0.02em;
+}
+.results-subtitle {
+  font-size: 0.85rem;
+  color: #444;
+  margin-top: 4px;
+}
+
+/* Gauge */
+.results-gauge-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 26px;
+}
+.gauge-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.gauge-pct-text {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #ccc;
+  margin-top: -14px;
+  line-height: 1;
+}
+.gauge-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+  margin-top: 4px;
+  letter-spacing: 0.03em;
+}
+
+/* Cards grid */
+.results-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 600px) {
+  .results-cards-grid { grid-template-columns: 1fr; }
+  .adhd-info-grid { grid-template-columns: 1fr; }
+}
+
+.result-card {
+  background: rgba(12,12,28,0.9);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 16px 18px;
+}
+.result-card.highlight-adhd {
+  border-color: rgba(255,59,48,0.35);
+  box-shadow: 0 0 20px rgba(255,59,48,0.1);
+}
+.result-card.highlight-td {
+  border-color: rgba(76,217,100,0.25);
+}
+
+.rc-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.rc-icon { font-size: 1.1rem; }
+.rc-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #888;
+  flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.rc-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.badge-td         { background: rgba(76,217,100,0.15);  color: #4cd964; border: 1px solid rgba(76,217,100,0.25); }
+.badge-borderline { background: rgba(255,204,0,0.15);   color: #ffcc00; border: 1px solid rgba(255,204,0,0.25); }
+.badge-adhd       { background: rgba(255,59,48,0.15);   color: #ff3b30; border: 1px solid rgba(255,59,48,0.25); }
+
+.rc-val {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #ddd;
+  margin-bottom: 8px;
+  line-height: 1.1;
+}
+
+.rc-bar-wrap {
+  height: 5px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+.rc-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.rc-bar.td         { background: linear-gradient(90deg, #4cd964, #30d158); }
+.rc-bar.borderline { background: linear-gradient(90deg, #ffcc00, #ff9500); }
+.rc-bar.adhd       { background: linear-gradient(90deg, #ff9500, #ff3b30); }
+.rc-bar.qe-td      { background: linear-gradient(90deg, #4cd964, #30d158); }
+.rc-bar.qe-borderline { background: linear-gradient(90deg, #ffcc00, #ff9500); }
+.rc-bar.qe-adhd    { background: linear-gradient(90deg, #ff9500, #ff3b30); }
+
+.rc-thresholds {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.thresh-td   { font-size: 0.68rem; color: rgba(76,217,100,0.6); }
+.thresh-adhd { font-size: 0.68rem; color: rgba(255,59,48,0.6); }
+
+.rc-desc {
+  font-size: 0.78rem;
+  color: #555;
+  line-height: 1.55;
+}
+
+/* Scatter section */
+.results-scatter-section {
+  margin-bottom: 24px;
+}
+.results-scatter-section h3,
+.results-temporal-section h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #bbb;
+  margin-bottom: 4px;
+}
+.scatter-subtitle {
+  font-size: 0.78rem;
+  color: #444;
+  margin-bottom: 10px;
+}
+.scatter-container {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  display: block;
+}
+#results-scatter-canvas {
+  display: block;
+  width: 100%;
+  height: 360px;
+}
+.scatter-legend {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  font-size: 0.72rem;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend-dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 2px solid;
+}
+.legend-dot.td   { border-color: #4cd964; background: rgba(76,217,100,0.2); }
+.legend-dot.adhd { border-color: #ff3b30; background: rgba(255,59,48,0.1); }
+
+/* Temporal section */
+.results-temporal-section {
+  margin-bottom: 24px;
+}
+#results-temporal-canvas {
+  width: 100%;
+  height: 120px;
+  max-width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  display: block;
+}
+
+/* Summary */
+.results-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: rgba(12,12,28,0.9);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 20px 22px;
+  margin-bottom: 24px;
+}
+
+.summary-icon {
+  font-size: 2.2rem;
+  flex-shrink: 0;
+  line-height: 1;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+}
+.summary-icon.summary-td       { background: rgba(76,217,100,0.08); }
+.summary-icon.summary-border   { background: rgba(255,204,0,0.08); }
+.summary-icon.summary-elevated { background: rgba(255,149,0,0.08); }
+.summary-icon.summary-adhd     { background: rgba(255,59,48,0.08); }
+
+.summary-text h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ddd;
+  margin-bottom: 6px;
+}
+.summary-text p {
+  font-size: 0.83rem;
+  color: #666;
+  line-height: 1.7;
+}
+
+/* Actions */
+.results-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   Accuracy Test — advance warning card + instruction banner
+   Mirrors the approach in calibration.html
+   ============================================================ */
+
+.acc-warning-card {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -55%);
+  text-align: center;
+  padding: 36px 40px;
+  background: linear-gradient(145deg, #0e0e24, #141430);
+  border: 1px solid rgba(255, 183, 3, 0.28);
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.65), 0 0 50px rgba(255,183,3,0.07);
+  max-width: 420px;
+  width: calc(100vw - 60px);
+  z-index: 30;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.acc-warning-card.visible { opacity: 1; }
+
+.acc-warning-icon {
+  font-size: 2.6rem;
+  margin-bottom: 14px;
+  display: block;
+}
+.acc-warning-card h3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #f0c040;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+.acc-warning-card p {
+  font-size: 0.92rem;
+  color: #999;
+  line-height: 1.75;
+}
+.acc-warning-card strong { color: #e0e0e0; }
+
+.acc-instr-banner {
+  position: absolute;
+  top: 46px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #e0e0e0;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  z-index: 30;
+  white-space: nowrap;
+  background: rgba(6, 6, 18, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 8px 22px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 183, 3, 0.18);
+}
+
+/* ============================================================
+   Error overlay button styling
+   ============================================================ */
+
+/* Danger button variant — red/orange tinted */
+.btn-danger-sm {
+  padding: 9px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 10px;
+  background: rgba(255, 59, 48, 0.15);
+  border: 1.5px solid rgba(255, 59, 48, 0.4);
+  color: #ff9500;
+  box-shadow: 0 2px 12px rgba(255, 59, 48, 0.15);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.btn-danger-sm:hover {
+  background: rgba(255, 59, 48, 0.25);
+  border-color: rgba(255, 59, 48, 0.6);
+  box-shadow: 0 4px 20px rgba(255, 59, 48, 0.25);
+  transform: translateY(-1px);
+}
+.btn-danger-sm:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 59, 48, 0.15);
+}
+.btn-danger-sm:focus-visible {
+  outline: 2px solid #ff3b30;
+  outline-offset: 2px;
+}
+
+/* Error overlay card — side-by-side buttons layout using CSS Grid */
+#adhd-error-overlay .overlay-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 12px;
+  align-items: center;
+  row-gap: 16px;
+}
+
+/* Stack text elements across full width */
+#adhd-error-overlay .overlay-card .icon {
+  grid-column: 1 / -1;
+}
+#adhd-error-overlay .overlay-card h3 {
+  grid-column: 1 / -1;
+}
+#adhd-error-overlay .overlay-card p {
+  grid-column: 1 / -1;
+  margin-bottom: 8px;
+}
+
+/* Buttons side-by-side */
+#adhd-error-overlay .overlay-card > button {
+  min-width: 100%;
+  padding: 11px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  border: none;
+  color: #fff;
+  margin: 0;
+}
+
+/* Primary button — Try Again (left) */
+#adhd-error-overlay #adhd-error-btn {
+  background: linear-gradient(135deg, #ee5a24, #d63031);
+  box-shadow: 0 6px 30px rgba(238, 90, 36, 0.38);
+}
+#adhd-error-overlay #adhd-error-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(238, 90, 36, 0.54);
+}
+#adhd-error-overlay #adhd-error-btn:active {
+  transform: translateY(0);
+}
+
+/* Recalibrate button — Full Recalibration (right) */
+#adhd-error-overlay #force-recalibrate-btn {
+  background: linear-gradient(135deg, #ff7043, #e64a19);
+  box-shadow: 0 6px 30px rgba(255, 112, 67, 0.38);
+}
+#adhd-error-overlay #force-recalibrate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(255, 112, 67, 0.54);
+}
+#adhd-error-overlay #force-recalibrate-btn:active {
+  transform: translateY(0);
+}
+
+/* ============================================================
+   Debug settings gear button & panel (fixation stability test)
+   ============================================================ */
+
+/* Purple accent instead of calibration orange */
+.gear-btn[aria-expanded="true"] {
+  color: #7c5cfc;
+}
+
+.toggle-btn:focus-visible {
+  outline-color: #7c5cfc;
+}
+.toggle-btn.on {
+  background: #7c5cfc;
+}

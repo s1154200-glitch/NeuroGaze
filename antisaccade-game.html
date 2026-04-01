@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Shield Deflector — NeuroGaze</title>
+  <script src="js/webgazer.js"></script>
+  <link rel="stylesheet" href="css/antisaccade-game.css">
+
+</head>
+<body>
+
+<!-- Optional gaze dot -->
+<div id="gaze-dot"></div>
+
+<!-- Screen overlays -->
+<div id="fail-flash"></div>
+<div id="success-flash"></div>
+
+<!-- Floating labels -->
+<div id="combo-label"></div>
+<div id="speedup-label">⚡ FASTER!</div>
+
+<!-- INTRO -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-card">
+    <div class="intro-icon">🛡️</div>
+    <div class="intro-title">The Shield Deflector</div>
+    <div class="intro-subtitle">
+      Train your <strong style="color:#5ce0f0">antisaccade control</strong>.<br>
+      A fireball spawns — look away to block it!
+    </div>
+    <ul class="intro-rules">
+      <li>A threat orb charges up on one side of the arena</li>
+      <li>Look to the <strong style="color:#5ce0f0">OPPOSITE side</strong> to raise your shield</li>
+      <li>Looking at the threat locks it on — instant game over</li>
+      <li>React too slowly and the orb fires at the center station</li>
+      <li>Every successful block increases the game speed</li>
+      <li>Survive as long as you can — there is no end!</li>
+    </ul>
+    <a href="dashboard.html" class="btn btn-ghost" style="margin-top:8px;">&#8592;Dashboard</a>
+    <button class="btn" id="btn-start">Begin Guarding</button>
+  </div>
+</div>
+
+<!-- CALIBRATING  -->
+<div id="screen-calibrating" class="screen">
+  <div class="cal-spinner"></div>
+  <div class="cal-msg" id="cal-msg">Initialising eye tracker…</div>
+</div>
+
+<!-- GAME -->
+<div id="screen-game" class="screen">
+
+  <!-- HUD -->
+  <div class="sdf-hud">
+    <div class="hud-item">
+      <span class="hud-label">Blocks</span>
+      <span class="hud-value accent" id="hud-score">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Streak</span>
+      <span class="hud-value" id="hud-streak">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Speed</span>
+      <span class="hud-value" id="hud-speed">1.0×</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Best</span>
+      <span class="hud-value accent" id="hud-best">0</span>
+    </div>
+  </div>
+
+  <!-- Arena -->
+  <div id="sdf-arena">
+
+    <!-- Left shield with threat orb slot -->
+    <div class="shield-zone" id="shield-left">
+      <div class="shield-ring-outer" id="ring-outer-left"></div>
+      <div class="shield-ring-mid"   id="ring-mid-left"></div>
+      <div class="shield-disc"       id="disc-left"></div>
+      <div class="zone-orb"          id="orb-left"></div>
+      <div class="shield-glyph">🛡</div>
+      <div class="shield-label">Shield L</div>
+    </div>
+
+    <!-- Center station with reaction timer ring -->
+    <div id="center-station">
+      <svg id="timer-svg" viewBox="0 0 92 92">
+        <circle cx="46" cy="46" r="40"
+          fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="4"/>
+        <circle id="timer-ring" cx="46" cy="46" r="40"
+          fill="none" stroke="#5ce0f0" stroke-width="4"
+          stroke-linecap="round"
+          stroke-dasharray="251.3"
+          stroke-dashoffset="0"
+          transform="rotate(-90 46 46)"/>
+      </svg>
+      <div id="station-core"></div>
+    </div>
+
+    <!-- Right shield with threat orb slot -->
+    <div class="shield-zone" id="shield-right">
+      <div class="shield-ring-outer" id="ring-outer-right"></div>
+      <div class="shield-ring-mid"   id="ring-mid-right"></div>
+      <div class="shield-disc"       id="disc-right"></div>
+      <div class="zone-orb"          id="orb-right"></div>
+      <div class="shield-glyph">🛡</div>
+      <div class="shield-label">Shield R</div>
+    </div>
+
+  </div><!-- /sdf-arena -->
+
+  <!-- LOOK LEFT / LOOK RIGHT hint -->
+  <div id="direction-label"></div>
+
+</div><!-- /screen-game -->
+
+<!-- ███████████  GAME-OVER  ████████████████████████████████ -->
+<div id="screen-gameover" class="screen">
+  <div class="go-card">
+    <div class="go-icon" id="go-icon">💥</div>
+    <div class="go-title">Shield Broken!</div>
+    <div class="go-reason" id="go-reason">The fireball slipped through</div>
+    <div class="go-sub" id="go-sub"></div>
+    <div class="go-scores">
+      <div class="score-pill">
+        <strong id="go-score">0</strong>
+        Total Blocks
+      </div>
+      <div class="score-pill streak">
+        <strong id="go-streak">0</strong>
+        Best Streak
+      </div>
+      <div class="score-pill highlight">
+        <strong id="go-best">0</strong>
+        All-Time Best
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btn-retry">Try Again</button>
+      <button class="btn btn-ghost" id="btn-menu">← Menu</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/settings-panel.js"></script>
+<script src="js/antisaccade-game.js"></script>
+</body>
+</html>

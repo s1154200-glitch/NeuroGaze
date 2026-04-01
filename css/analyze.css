@@ -1,0 +1,86 @@
+    /* ── Layout override for analysis page ────────────────────── */
+    /* Keep original html/body locked so sidebar never scrolls;
+       only .dash-grid scrolls the content area internally. */
+    .main { overflow: hidden; }
+    .dash-grid {
+      display: flex !important;
+      flex-direction: column;
+      grid-template-columns: none !important;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* ── Analysis page styles ─────────────────────────────────── */
+    .analyze-grid{display:flex;flex-direction:column;gap:22px;padding:0 0 40px;width:100%}
+    .az-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+    .az-header h2{font-size:1.35rem;font-weight:700;color:#fff;margin:0}
+    .az-header p{font-size:.82rem;color:rgba(255,255,255,.45);margin:0}
+    .az-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:10px;border:1px solid rgba(124,92,252,.35);background:rgba(124,92,252,.12);color:#b9a4ff;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
+    .az-btn:hover{background:rgba(124,92,252,.25);border-color:#7c5cfc}
+    .az-btn svg{flex-shrink:0}
+    .az-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:24px 26px;transition:border-color .2s;width:100%}
+    .az-card:hover{border-color:rgba(124,92,252,.2)}
+    .az-card-hdr{display:flex;align-items:center;gap:12px;margin-bottom:18px;position:relative}
+    .az-card-hdr h3{font-size:1rem;font-weight:700;color:#fff;margin:0;flex:1}
+    .card-dots{margin-left:auto;background:none;border:none;color:rgba(255,255,255,.35);font-size:1.2rem;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1;transition:color .15s,background .15s;flex-shrink:0}
+    .card-dots:hover{color:#fff;background:rgba(255,255,255,.08)}
+    .az-card-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);background:#1a1828;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:6px;min-width:168px;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+    .az-card-menu.open{display:block}
+    .az-del-btn{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;background:none;border:none;color:rgba(255,59,48,.85);font-size:.8rem;font-weight:600;cursor:pointer;border-radius:7px;text-align:left;transition:background .15s}
+    .az-del-btn:hover{background:rgba(255,59,48,.12)}
+    .az-del-btn svg{flex-shrink:0}
+    .pdf-mode .card-dots{display:none!important}
+    .pdf-mode .az-card-menu{display:none!important}
+    .az-card-hdr .az-badge{font-size:.7rem;padding:3px 10px;border-radius:20px;font-weight:600}
+    .az-badge-up{background:rgba(76,217,100,.12);color:#4cd964;border:1px solid rgba(76,217,100,.25)}
+    .az-badge-down{background:rgba(255,59,48,.12);color:#ff3b30;border:1px solid rgba(255,59,48,.25)}
+    .az-badge-flat{background:rgba(255,149,0,.12);color:#ff9500;border:1px solid rgba(255,149,0,.25)}
+    .az-badge-na{background:rgba(255,255,255,.06);color:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.08)}
+    .az-chart-wrap{position:relative;width:100%;height:280px;margin-bottom:16px}
+    .az-chart-wrap canvas{position:absolute;top:0;left:0;width:100%!important;height:100%!important}
+    .az-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:14px}
+    .az-metric{background:rgba(255,255,255,.03);border-radius:10px;padding:12px 14px;text-align:center}
+    .az-metric-val{font-size:1.3rem;font-weight:700;color:#fff}
+    .az-metric-lbl{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:3px}
+    .az-insight{font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.5;padding:14px 16px;background:rgba(124,92,252,.06);border-left:3px solid #7c5cfc;border-radius:0 10px 10px 0}
+    .az-overall{background:linear-gradient(135deg,rgba(124,92,252,.08),rgba(76,217,100,.05));border:1px solid rgba(124,92,252,.15)}
+    .az-overall h3{font-size:1.15rem}
+    .az-score-ring{width:120px;height:120px;margin:0 auto 16px}
+    .az-suggestions{list-style:none;padding:0;margin:14px 0 0}
+    .az-suggestions li{font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.55;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.03);margin-bottom:8px;position:relative;padding-left:34px}
+    .az-suggestions li::before{content:'';position:absolute;left:14px;top:14px;width:8px;height:8px;border-radius:50%}
+    .az-suggestions li.sug-good::before{background:#4cd964}
+    .az-suggestions li.sug-warn::before{background:#ff9500}
+    .az-suggestions li.sug-bad::before{background:#ff3b30}
+    .az-suggestions li.sug-info::before{background:#7c5cfc}
+    .az-empty{text-align:center;padding:60px 20px;color:rgba(255,255,255,.3)}
+    .az-empty svg{margin-bottom:14px;opacity:.3}
+    .az-empty p{font-size:.88rem}
+    .az-divider{border:none;border-top:1px solid rgba(255,255,255,.06);margin:8px 0 4px}
+    .az-overall-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:18px 0}
+    .az-overall-metric{text-align:center;padding:16px;background:rgba(255,255,255,.03);border-radius:12px}
+    .az-overall-metric .az-metric-val{font-size:1.5rem}
+
+
+    /* ── PDF light theme (applied via JS class) ───────────────── */
+    .pdf-mode{background:#fff!important;color:#111!important}
+    .pdf-mode .az-card{background:#fff!important;border:1px solid #ddd!important}
+    .pdf-mode .az-card-hdr h3{color:#111!important}
+    .pdf-mode .az-metric-val{color:#111!important}
+    .pdf-mode .az-metric-lbl{color:#555!important}
+    .pdf-mode .az-metric{background:#f5f5f5!important}
+    .pdf-mode .az-overall-metric{background:#f5f5f5!important}
+    .pdf-mode .az-insight{color:#333!important;background:rgba(124,92,252,.08)!important;border-left-color:#7c5cfc!important}
+    .pdf-mode .az-header h2{color:#111!important}
+    .pdf-mode .az-header p{color:#666!important}
+    .pdf-mode .az-badge-up{background:#e8f9ec!important;color:#1a8a3e!important;border-color:#b3e6c2!important}
+    .pdf-mode .az-badge-down{background:#fde8e6!important;color:#cc1a0a!important;border-color:#f5b3ae!important}
+    .pdf-mode .az-badge-flat{background:#fff3e0!important;color:#c27400!important;border-color:#ffe0a6!important}
+    .pdf-mode .az-badge-na{background:#f0f0f0!important;color:#888!important;border-color:#ddd!important}
+    .pdf-mode .az-suggestions li{background:#f5f5f5!important;color:#333!important}
+    .pdf-mode .az-overall{background:#f9f7ff!important;border-color:#ddd!important}
+    .pdf-mode .az-divider{border-top-color:#ddd!important}
+    .pdf-mode h4{color:#111!important}
+    .pdf-mode .az-chart-wrap{background:#1a1a2e!important;border-radius:10px!important}
+
+    @media print{.sidebar,.topbar,.az-btn{display:none!important}.main{margin:0!important;padding:10px!important}.az-card{break-inside:avoid;page-break-inside:avoid}}

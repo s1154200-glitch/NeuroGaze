@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CPT Go/No-Go — ADHD Sustained Attention Screening</title>
+  <script src="js/webgazer.js"></script>
+  <link rel="stylesheet" href="css/calibration.css">
+  <link rel="stylesheet" href="css/cpt-test.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       Screen: Intro
+       ============================================================ -->
+  <div id="cpt-intro-screen" class="screen active" role="main">
+    <div class="cpt-intro-card">
+
+      <div class="cpt-logo">
+  <svg viewBox="0 0 72 72" width="64" height="64" fill="none">
+    <!-- Outer ambient ring - made more circular (slightly larger radius) -->
+    <circle cx="36" cy="36" r="34.5" stroke="#34d399" stroke-width="2" opacity="0.14"/>
+
+    <!-- GO panel (left) -->
+    <rect x="6.5" y="18" width="25" height="30" rx="7"
+          fill="rgba(52,211,153,0.10)" stroke="#34d399" stroke-width="1.8"/>
+    
+    <!-- "A" moved more to the right inside the panel -->
+    <text x="19.5" y="39" font-size="16" font-weight="900" text-anchor="middle"
+          font-family="-apple-system,sans-serif" fill="#34d399">A</text>
+    
+    <!-- Green ✓ badge -->
+    <circle cx="28.5" cy="20" r="5" fill="#34d399" opacity="0.9"/>
+    <path d="M 25.2 20 L 26.8 21.6 L 30 18.4"
+          stroke="#060e1c" stroke-width="1.6" stroke-linecap="round"
+          stroke-linejoin="round" fill="none"/>
+
+    <!-- NO-GO panel (right) -->
+    <rect x="39.5" y="18" width="25" height="30" rx="7"
+          fill="rgba(255,59,48,0.07)" stroke="#ff3b30" stroke-width="1.8" opacity="0.8"/>
+    
+    <!-- "X" moved more to the left inside the panel -->
+    <text x="53" y="39" font-size="16" font-weight="900" text-anchor="middle"
+          font-family="-apple-system,sans-serif" fill="#ff5e5e">X</text>
+    
+    <!-- Prohibition symbol -->
+    <circle cx="53" cy="33" r="7" fill="none" stroke="#ff3b30"
+            stroke-width="1.8" opacity="0.6"/>
+
+    <!-- EEG / reaction-time wave at bottom - smaller and more compact -->
+    <path d="M 11 57.5 L 16 59.5 L 19 55.5 L 23 61.5 L 27 58 L 33.5 58 L 37.5 55.5 L 41.5 61 L 46 58 L 60 58"
+          stroke="#34d399" stroke-width="1.25" stroke-linecap="round"
+          stroke-linejoin="round" fill="none" opacity="0.3"/>
+  </svg>
+</div>
+
+      <h1>CPT Go/No-Go</h1>
+      <p class="cpt-subtitle">Sustained Attention — ADHD Biomarker</p>
+
+      <div class="cpt-info-grid">
+        <div class="cpt-info-item">
+          <div class="cpt-info-icon">⏱</div>
+          <div class="cpt-info-text"><strong>5 Minutes</strong><br>~240 stimulus trials</div>
+        </div>
+        <div class="cpt-info-item">
+          <div class="cpt-info-icon">🧠</div>
+          <div class="cpt-info-text"><strong>Sustained Attention</strong><br>Focus maintenance over time</div>
+        </div>
+        <div class="cpt-info-item">
+          <div class="cpt-info-icon">📊</div>
+          <div class="cpt-info-text"><strong>4 Biomarkers</strong><br>Commission, Omission, RTV, Gaze</div>
+        </div>
+        <div class="cpt-info-item">
+          <div class="cpt-info-icon">🎯</div>
+          <div class="cpt-info-text"><strong>Webcam Gaze</strong><br>Off-task attention tracking</div>
+        </div>
+      </div>
+
+      <div class="cpt-instructions">
+        <p>
+          <span class="cpt-step-num">1</span>
+          Letters will flash on screen one at a time, every 1.25 seconds.
+        </p>
+        <p>
+          <span class="cpt-step-num">2</span>
+          Press <span class="key-badge">SPACE</span> as quickly as possible for every letter <strong>except</strong>
+          <span class="letter-x-highlight">X</span>.
+        </p>
+        <p>
+          <span class="cpt-step-num">3</span>
+          When you see <span class="letter-x-highlight">X</span>, <strong>do NOT press</strong> anything —
+          withhold your response completely.
+        </p>
+        <p>
+          <span class="cpt-step-num">4</span>
+          Keep your gaze focused on the center of the screen throughout the full 5 minutes.
+        </p>
+      </div>
+
+      <div class="cpt-disclaimer">
+        ⚠ This is a <strong>research screening tool</strong>, not a clinical diagnosis. Results are indicative only.
+        Consult a qualified clinician for any diagnostic assessment.
+      </div>
+
+      <div class="cpt-intro-btns">
+        <button id="cpt-start-btn" class="btn btn-cpt">Begin Task</button>
+        <a href="dashboard.html" class="btn btn-sm" style="text-decoration:none">← Dashboard</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Screen: Task
+       ============================================================ -->
+  <div id="cpt-task-screen" class="screen" role="main" aria-label="CPT task">
+
+    <!-- Pre-task countdown -->
+    <div id="cpt-countdown" class="cpt-countdown" aria-live="polite" style="display:none">
+      <div class="cpt-countdown-ring">
+        <svg viewBox="0 0 100 100" width="160" height="160">
+          <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(52,211,153,0.12)" stroke-width="6"/>
+          <circle id="cpt-countdown-arc" cx="50" cy="50" r="44" fill="none"
+                  stroke="#34d399" stroke-width="6" stroke-linecap="round"
+                  stroke-dasharray="276.46" stroke-dashoffset="0"
+                  transform="rotate(-90 50 50)"/>
+        </svg>
+        <div id="cpt-countdown-num" class="cpt-countdown-num">3</div>
+      </div>
+      <p class="cpt-countdown-label">Get ready…</p>
+    </div>
+
+    <!-- Focus zone ring guide -->
+    <div class="cpt-focus-ring" aria-hidden="true"></div>
+
+    <!-- Letter display -->
+    <div class="cpt-letter-wrap" aria-live="assertive" aria-atomic="true">
+      <div id="cpt-letter" class="cpt-letter" aria-label="stimulus letter"></div>
+    </div>
+
+    <!-- Spacebar ripple feedback -->
+    <div id="cpt-press-ripple" class="cpt-press-ripple" aria-hidden="true"></div>
+
+    <!-- Response feedback label -->
+    <div id="cpt-feedback" class="cpt-feedback" aria-live="assertive"></div>
+
+    <!-- Off-task gaze vignette -->
+    <div id="cpt-gaze-vignette" class="cpt-gaze-vignette" aria-hidden="true"></div>
+
+    <!-- Halfway milestone banner -->
+    <div id="cpt-milestone-banner" class="cpt-milestone-banner" aria-live="polite"></div>
+
+    <!-- Live HUD -->
+    <div id="cpt-live-hud" class="cpt-live-hud" aria-live="polite" style="display:none">
+      <!-- Circular countdown timer -->
+      <div class="cpt-hud-timer-wrap" title="Time remaining">
+        <svg class="cpt-hud-timer-svg" viewBox="0 0 50 50" width="52" height="52">
+          <circle cx="25" cy="25" r="22" fill="none"
+                  stroke="rgba(52,211,153,0.12)" stroke-width="4"/>
+          <circle id="cpt-hud-timer-arc" cx="25" cy="25" r="22" fill="none"
+                  stroke="#34d399" stroke-width="4" stroke-linecap="round"
+                  stroke-dasharray="138" stroke-dashoffset="0"
+                  transform="rotate(-90 25 25)"/>
+        </svg>
+        <span id="cpt-hud-timer-text" class="cpt-hud-timer-text">5:00</span>
+      </div>
+
+      <!-- Live metrics -->
+      <div class="cpt-hud-metrics">
+        <div class="cpt-hud-metric">
+          <div class="cpt-hud-metric-lbl">Trials</div>
+          <div id="cpt-hud-trials" class="cpt-hud-metric-val">0</div>
+        </div>
+        <div class="cpt-hud-metric">
+          <div class="cpt-hud-metric-lbl">Commission</div>
+          <div id="cpt-hud-commission" class="cpt-hud-metric-val">—</div>
+        </div>
+        <div class="cpt-hud-metric">
+          <div class="cpt-hud-metric-lbl">Omission</div>
+          <div id="cpt-hud-omission" class="cpt-hud-metric-val">—</div>
+        </div>
+        <div class="cpt-hud-metric">
+          <div class="cpt-hud-metric-lbl">RTV</div>
+          <div id="cpt-hud-rtv" class="cpt-hud-metric-val">—</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       Screen: Results
+       ============================================================ -->
+  <div id="cpt-results-screen" class="screen" role="main" aria-label="Test results">
+    <div class="cpt-results-wrap">
+
+      <!-- Header -->
+      <div class="cpt-results-header">
+        <h2>CPT Report</h2>
+        <p class="cpt-results-subtitle">Sustained Attention &amp; Inhibitory Control Biomarker Analysis — 5-Minute Battery (first 8 warm-up trials excluded from RT stats)</p>
+      </div>
+
+      <!-- ADHD Probability Gauge -->
+      <div class="cpt-gauge-section">
+        <div class="cpt-gauge-wrap">
+          <svg id="cpt-gauge-svg" viewBox="0 0 200 110" width="260" height="143">
+            <path d="M 10 100 A 90 90 0 0 1 190 100" fill="none"
+                  stroke="rgba(255,255,255,0.06)" stroke-width="18" stroke-linecap="round"/>
+            <path id="cpt-gauge-arc" d="M 10 100 A 90 90 0 0 1 190 100" fill="none"
+                  stroke="#4cd964" stroke-width="18" stroke-linecap="round"
+                  stroke-dasharray="283" stroke-dashoffset="283"/>
+            <g id="cpt-gauge-needle" transform="rotate(-90 100 100)">
+              <line x1="100" y1="100" x2="100" y2="22" stroke="#fff" stroke-width="2.5"
+                    stroke-linecap="round" opacity="0.9"/>
+              <circle cx="100" cy="100" r="5" fill="#fff" opacity="0.9"/>
+            </g>
+          </svg>
+          <div id="cpt-gauge-pct" class="cpt-gauge-pct-text">0%</div>
+          <div id="cpt-gauge-label" class="cpt-gauge-label">Calculating…</div>
+        </div>
+      </div>
+
+      <!-- Biomarker Cards -->
+      <div class="cpt-cards-grid">
+
+        <!-- Commission Errors -->
+        <div class="cpt-result-card" id="cpt-card-com">
+          <div class="cpt-rc-header">
+            <span class="cpt-rc-icon">🚫</span>
+            <span class="cpt-rc-title">Commission Errors (False Alarms)</span>
+            <span id="cpt-rc-com-badge" class="cpt-rc-badge">—</span>
+          </div>
+          <div id="cpt-rc-com-val" class="cpt-rc-val">—</div>
+          <div class="cpt-rc-bar-wrap">
+            <div id="cpt-rc-com-bar" class="cpt-rc-bar" style="width:0%"></div>
+          </div>
+          <div class="cpt-rc-thresholds">
+            <span class="cpt-thresh-td">TD &lt; 5%</span>
+            <span class="cpt-thresh-adhd">ADHD &gt; 15%</span>
+          </div>
+          <p id="cpt-rc-com-desc" class="cpt-rc-desc">—</p>
+        </div>
+
+        <!-- Omission Errors -->
+        <div class="cpt-result-card" id="cpt-card-omi">
+          <div class="cpt-rc-header">
+            <span class="cpt-rc-icon">💤</span>
+            <span class="cpt-rc-title">Omission Errors (Missed Targets)</span>
+            <span id="cpt-rc-omi-badge" class="cpt-rc-badge">—</span>
+          </div>
+          <div id="cpt-rc-omi-val" class="cpt-rc-val">—</div>
+          <div class="cpt-rc-bar-wrap">
+            <div id="cpt-rc-omi-bar" class="cpt-rc-bar" style="width:0%"></div>
+          </div>
+          <div class="cpt-rc-thresholds">
+            <span class="cpt-thresh-td">TD &lt; 2%</span>
+            <span class="cpt-thresh-adhd">ADHD &gt; 10%</span>
+          </div>
+          <p id="cpt-rc-omi-desc" class="cpt-rc-desc">—</p>
+        </div>
+
+        <!-- Response Time Variability -->
+        <div class="cpt-result-card" id="cpt-card-rtv">
+          <div class="cpt-rc-header">
+            <span class="cpt-rc-icon">📊</span>
+            <span class="cpt-rc-title">Response Time Variability (RTV)</span>
+            <span id="cpt-rc-rtv-badge" class="cpt-rc-badge">—</span>
+          </div>
+          <div id="cpt-rc-rtv-val" class="cpt-rc-val">—</div>
+          <div class="cpt-rc-bar-wrap">
+            <div id="cpt-rc-rtv-bar" class="cpt-rc-bar" style="width:0%"></div>
+          </div>
+          <div class="cpt-rc-thresholds">
+            <span class="cpt-thresh-td">TD &lt; 80ms SD</span>
+            <span class="cpt-thresh-adhd">ADHD &gt; 160ms SD</span>
+          </div>
+          <p id="cpt-rc-rtv-desc" class="cpt-rc-desc">—</p>
+        </div>
+
+        <!-- Gaze Wander -->
+        <div class="cpt-result-card" id="cpt-card-gw">
+          <div class="cpt-rc-header">
+            <span class="cpt-rc-icon">👁</span>
+            <span class="cpt-rc-title">Gaze Wander (Off-Task)</span>
+            <span id="cpt-rc-gw-badge" class="cpt-rc-badge">—</span>
+          </div>
+          <div id="cpt-rc-gw-val" class="cpt-rc-val">—</div>
+          <div class="cpt-rc-bar-wrap">
+            <div id="cpt-rc-gw-bar" class="cpt-rc-bar" style="width:0%"></div>
+          </div>
+          <div class="cpt-rc-thresholds">
+            <span class="cpt-thresh-td">TD &lt; 10%</span>
+            <span class="cpt-thresh-adhd">ADHD &gt; 30%</span>
+          </div>
+          <p id="cpt-rc-gw-desc" class="cpt-rc-desc">—</p>
+        </div>
+
+      </div>
+
+      <!-- Attentional Decay (First vs Second Half) -->
+      <div class="cpt-halves-section">
+        <h3>Attentional Decay</h3>
+        <p class="cpt-halves-subtitle">
+          Comparing first and second half of the task — red values indicate performance worsened.
+        </p>
+        <div class="cpt-halves-grid">
+
+          <div class="cpt-half-card">
+            <h4>First Half <span>(0 – 2:30 min)</span></h4>
+            <div class="cpt-half-row">
+              <span class="cpt-half-lbl">Trials</span>
+              <span id="cpt-h1-trials" class="cpt-half-val">—</span>
+            </div>
+            <div class="cpt-half-row">
+              <span class="cpt-half-lbl">Omission Rate</span>
+              <span id="cpt-h1-omi-rate" class="cpt-half-val">—</span>
+            </div>
+            <div class="cpt-half-row">
+              <span class="cpt-half-lbl">Avg Correct RT</span>
+              <span id="cpt-h1-avg-rt" class="cpt-half-val">—</span>
+            </div>
+            <div class="cpt-half-row">
+              <span class="cpt-half-lbl">Gaze Off-Task</span>
+              <span id="cpt-h1-gaze" class="cpt-half-val">—</span>
+            </div>
+          </div>
+
+          <div class="cpt-half-card">
+            <h4>Second Half <span>(2:30 – 5:00 min)</span></h4>
+            <div class="cpt-half-row">
+              <span class="cpt-half-lbl">Trials</span>
+              <span id="cpt-h2-trials" class="cpt-half-val">—</span>
+            </div>
+            <div class="cpt-half-row">
+              <span class="cpt-half-lbl">Omission Rate</span>
+              <span id="cpt-h2-omi-rate" class="cpt-half-val">—</span>
+            </div>
+            <div class="cpt-half-row">
+              <span class="cpt-half-lbl">Avg Correct RT</span>
+              <span id="cpt-h2-avg-rt" class="cpt-half-val">—</span>
+            </div>
+            <div class="cpt-half-row">
+              <span class="cpt-half-lbl">Gaze Off-Task</span>
+              <span id="cpt-h2-gaze" class="cpt-half-val">—</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Per-trial Data Table -->
+      <div class="cpt-table-section" style="margin-bottom:28px;">
+        <h3 style="font-size:1.05rem;font-weight:700;color:#ccc;margin-bottom:6px;">Trial-by-Trial Data</h3>
+        <p style="font-size:0.8rem;color:#444;margin-bottom:14px;">Complete breakdown of all trials</p>
+        <div style="overflow-x:auto;background:rgba(5,10,18,0.9);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:16px;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.82rem;" aria-label="Trial data table">
+            <thead>
+              <tr style="color:#555;text-transform:uppercase;font-size:0.68rem;letter-spacing:0.06em;border-bottom:1px solid rgba(255,255,255,0.06);">
+                <th style="padding:8px 10px;text-align:left;">#</th>
+                <th style="padding:8px 10px;text-align:left;">Letter</th>
+                <th style="padding:8px 10px;text-align:left;">Type</th>
+                <th style="padding:8px 10px;text-align:left;">Outcome</th>
+                <th style="padding:8px 10px;text-align:left;">RT</th>
+                <th style="padding:8px 10px;text-align:left;">Half</th>
+              </tr>
+            </thead>
+            <tbody id="cpt-table-body">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="cpt-results-summary">
+        <div id="cpt-summary-icon" class="cpt-summary-icon">🧠</div>
+        <div class="cpt-summary-text">
+          <h3 id="cpt-summary-title">Analyzing…</h3>
+          <p id="cpt-summary-body">Please wait while the biomarkers are computed.</p>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="cpt-results-actions">
+        <button id="cpt-retest-btn" class="btn btn-cpt">↺ Retest</button>
+        <a href="dashboard.html" class="btn btn-sm" style="text-decoration:none">← Dashboard</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Loading Overlay
+       ============================================================ -->
+  <div id="cpt-loading-overlay" class="overlay" role="status" aria-live="polite">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <h3>Initializing Eye Tracking…</h3>
+      <p>Please allow camera access when prompted.<br>This may take a few seconds.</p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Error Overlay
+       ============================================================ -->
+  <div id="cpt-error-overlay" class="overlay" role="alertdialog" aria-modal="true">
+    <div class="overlay-card">
+      <div class="icon" aria-hidden="true">⚠️</div>
+      <h3 id="cpt-error-title">Something went wrong</h3>
+      <p id="cpt-error-message">An unexpected error occurred.</p>
+      <button id="cpt-error-btn" class="btn btn-primary">Try Again</button>
+      <button id="cpt-force-recal-btn" class="btn btn-danger-sm">Full Recalibration</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Recalibration Overlay
+       ============================================================ -->
+  <div id="recalibrate-overlay" role="alertdialog" aria-modal="true">
+    <div class="recalibrate-card">
+      <div class="icon" aria-hidden="true">&#128065;</div>
+      <h3 id="recalibrate-title">Accuracy Check Required</h3>
+      <p id="recalibrate-message">Your face position has shifted. Please look at the center dot to recheck accuracy.</p>
+      <div id="recalibrate-accuracy" class="accuracy-value" style="display:none"></div>
+      <div class="recheck-btn-row">
+        <button id="recheck-btn" class="btn btn-primary">Look at Center &amp; Recheck</button>
+        <button id="modal-fullrecal-btn" class="btn btn-danger-sm">Full Recalibration</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Debug overlays (used by settings panel & face-tracking.js)
+       ============================================================ -->
+  <div id="gaze-dot" aria-hidden="true"></div>
+  <div id="face-boundary-box"></div>
+  <div id="position-warning">
+    <span id="position-warning-text">Move back to calibration position</span>
+  </div>
+  <div id="face-info-badge">
+    <div class="fi-label">Face Position</div>
+    <div class="fi-row">
+      <span>Offset: <span id="fi-offset" class="fi-val ok">0px</span></span>
+      <span>Depth:  <span id="fi-depth"  class="fi-val ok">100%</span></span>
+      <span>Status: <span id="fi-status" class="fi-val ok">OK</span></span>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/state.js"></script>
+  <script src="js/face-tracking.js"></script>
+  <script src="js/settings-panel.js"></script>
+  <script src="js/cpt-test.js"></script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebGazer Eye Tracking Calibration</title>
+  <script src="js/webgazer.js"></script>
+  <link rel="stylesheet" href="css/calibration.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       Screen — Camera Check
+       ============================================================ -->
+  <div id="camera-check-screen" class="screen active" role="main" aria-label="Camera check">
+    <div class="camera-check-card">
+      <div class="cam-check-icon-wrap">
+        <svg viewBox="0 0 64 64" width="44" height="44" fill="none">
+          <rect x="4" y="14" width="56" height="40" rx="7" stroke="#ee5a24" stroke-width="2.5"/>
+          <circle cx="32" cy="34" r="11" stroke="#ee5a24" stroke-width="2.5"/>
+          <circle cx="32" cy="34" r="5" fill="#ee5a24" opacity="0.6"/>
+          <rect x="22" y="8" width="20" height="8" rx="3" stroke="#ee5a24" stroke-width="2"/>
+          <circle cx="50" cy="22" r="3" fill="#ee5a24" opacity="0.5"/>
+        </svg>
+      </div>
+      <h2>Camera Check</h2>
+      <p class="cam-check-sub">Position yourself before starting calibration</p>
+
+      <div id="camera-preview-wrap">
+        <video id="camera-preview" autoplay muted playsinline></video>
+        <div class="face-guide-overlay">
+          <div class="face-guide-oval"></div>
+          <div class="face-guide-label">Center your face here</div>
+        </div>
+        <div id="cam-error-msg" class="cam-error-msg" hidden>
+          <div style="font-size:2rem">&#128247;</div>
+          <p>Camera access denied or unavailable.<br>Allow the permission in your browser, then tap <strong>Try Again</strong>.</p>
+          <button id="cam-retry-btn" class="btn btn-sm" style="margin-top:10px;">&#8635; Try Again</button>
+        </div>
+      </div>
+
+      <ul class="cam-checklist">
+        <li><span class="cam-check-tick">&#10003;</span> Center your face within the oval guide</li>
+        <li><span class="cam-check-tick">&#10003;</span> Both eyes clearly visible &mdash; good lighting helps</li>
+        <li><span class="cam-check-tick">&#10003;</span> Look <strong>directly at the camera</strong>, not at the screen</li>
+        <li><span class="cam-check-tick">&#10003;</span> Sit about 50&ndash;70 cm from the screen</li>
+      </ul>
+
+      <div class="cam-btn-row">
+        <a href="dashboard.html" class="btn btn-secondary">&#8592; Dashboard</a>
+        <button id="cam-confirm-btn" class="btn btn-primary">Looks Good &mdash; Continue &#8594;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Screen — Welcome
+       ============================================================ -->
+  <div id="welcome-screen" class="screen" role="main">
+    <div class="welcome-card">
+      <h1>Eye Tracking Calibration</h1>
+      <p class="subtitle">Powered by WebGazer.js</p>
+
+      <div class="steps">
+        <p><span class="num">1</span> Allow camera access when prompted</p>
+        <p><span class="num">2</span> Look at each red dot and click it<strong>5&nbsp;times</strong></p>
+        <p><span class="num">3</span> Keep your head still and face centered during calibration</p>
+        <p><span class="num">4</span> After 9 points, test your live gaze tracking</p>
+      </div>
+
+      <button id="start-btn" class="btn btn-primary">Start Calibration</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Screen — Calibration
+       ============================================================ -->
+  <div id="calibration-screen" class="screen" role="main" aria-label="Calibration in progress">
+    <!-- Top progress bar -->
+    <div class="progress-bar-wrap"
+         role="progressbar" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0">
+      <div id="progress-fill" class="progress-bar-fill"></div>
+    </div>
+
+    <!-- Progress badge -->
+    <div id="progress-badge" class="progress-badge" aria-live="polite">0 / 9</div>
+
+    <!-- Instruction banner -->
+    <div class="instruction-banner" aria-live="polite">
+      <p id="instruction-text">Look at the red dot and click it 5 times. Keep your head still.</p>
+    </div>
+
+    <!-- Calibration dots injected by JS -->
+  </div>
+
+  <!-- ============================================================
+       Screen — Success / Demo
+       ============================================================ -->
+  <!-- Gaze dot and trail canvas — at body level so z-index competes with WebGazer camera overlay -->
+  <div id="gaze-dot" aria-hidden="true"></div>
+  <canvas id="trail-canvas"></canvas>
+
+  <div id="success-screen" class="screen" role="main" aria-label="Calibration complete">
+
+    <!-- Floating HUD panel -->
+    <div class="success-hud">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="lbl">Avg Error</div>
+          <div class="val" id="stat-avg-error">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="lbl">Est. Accuracy</div>
+          <div class="val" id="stat-accuracy">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="lbl">Samples</div>
+          <div class="val" id="stat-samples">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Error Overlay
+       ============================================================ -->
+  <div id="error-overlay" class="overlay" role="alertdialog" aria-modal="true">
+    <div class="overlay-card">
+      <div class="icon" aria-hidden="true">&#9888;&#65039;</div>
+      <h3 id="error-title">Something went wrong</h3>
+      <p  id="error-message">An unexpected error occurred.</p>
+      <button id="error-btn" class="btn btn-primary">Try Again</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Loading Overlay
+       ============================================================ -->
+  <div id="loading-overlay" class="overlay" role="status" aria-live="polite">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <h3>Initializing Eye Tracking…</h3>
+      <p>Please allow camera access when prompted.<br>This may take a few seconds.</p>
+    </div>
+  </div>
+
+  <!-- Face boundary box overlay (around camera preview) -->
+  <div id="face-boundary-box"></div>
+
+  <!-- Face position warning -->
+  <div id="position-warning">
+    <span id="position-warning-text">Move back to calibration position</span>
+  </div>
+
+  <!-- Recalibration overlay -->
+  <div id="recalibrate-overlay" role="alertdialog" aria-modal="true">
+    <div class="recalibrate-card">
+      <div class="icon" aria-hidden="true">&#128065;</div>
+      <h3 id="recalibrate-title">Accuracy Check Required</h3>
+      <p id="recalibrate-message">Your face position has shifted significantly. Please look at the center dot to recheck accuracy.</p>
+      <div id="recalibrate-accuracy" class="accuracy-value" style="display:none"></div>
+      <div class="recheck-btn-row">
+        <button id="recheck-btn" class="btn btn-primary">Look at Center &amp; Recheck</button>
+        <button id="force-recalibrate-btn" class="btn btn-danger-sm">Full Recalibration</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Face position info badge -->
+  <div id="face-info-badge">
+    <div class="fi-label">Face Position</div>
+    <div class="fi-row">
+      <span>Offset: <span id="fi-offset" class="fi-val ok">0%</span></span>
+      <span>Depth: <span id="fi-depth" class="fi-val ok">100%</span></span>
+      <span>Status: <span id="fi-status" class="fi-val ok">OK</span></span>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Bottom-left quick-access panel: Back + 4 tests
+       ============================================================ -->
+  <div id="cal-nav-panel">
+    <a href="dashboard.html" class="cal-back-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      Dashboard
+    </a>
+    <div class="cal-nav-divider"></div>
+    <a href="fixation-stability-test.html" class="cal-nav-item">
+      <span class="cal-nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-opacity="0.35"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+      </span>
+      <span class="cal-nav-name">Fixation Stability</span>
+      <svg class="cal-nav-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+    <a href="antisaccade-test.html" class="cal-nav-item">
+      <span class="cal-nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      </span>
+      <span class="cal-nav-name">Antisaccade</span>
+      <svg class="cal-nav-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+    <a href="cpt-test.html" class="cal-nav-item">
+      <span class="cal-nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      </span>
+      <span class="cal-nav-name">CPT Vigilance</span>
+      <svg class="cal-nav-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+    <a href="distractor-recovery-test.html" class="cal-nav-item">
+      <span class="cal-nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </span>
+      <span class="cal-nav-name">Distractor Recovery</span>
+      <svg class="cal-nav-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/webgazer-init.js"></script>
+  <script src="js/face-tracking.js"></script>
+  <script src="js/calibration.js"></script>
+  <script src="js/gaze-demo.js"></script>
+  <script src="js/settings-panel.js"></script>
+  <script src="js/calibration-ui.js"></script>
+
+</body>
+</html>

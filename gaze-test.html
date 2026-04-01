@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gaze Accuracy Test</title>
+  <script src="js/webgazer.js"></script>
+  <!-- calibration.css supplies gear-btn, settings-panel, face-tracking, and
+       recalibrate-overlay styles. Loaded before inline styles so that the
+       page's own rules take priority for any class names that conflict. -->
+  <link rel="stylesheet" href="css/calibration.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                   'Helvetica Neue', Arial, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      line-height: 1.6;
+      user-select: none;
+    }
+
+    /* ── Game area (full screen) ── */
+    #game-area {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    /* ── Gaze dot ── */
+    #gaze-dot {
+      position: fixed;
+      width: 14px;
+      height: 14px;
+      background: rgba(99, 179, 237, 0.9);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 900;
+      display: none;
+      box-shadow: 0 0 10px rgba(99, 179, 237, 0.7), 0 0 20px rgba(99, 179, 237, 0.3);
+    }
+    #gaze-dot.visible { display: block; }
+
+    /* ── Target circle container ── */
+    .target-circle {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      /* overflow must be visible so the tolerance ring can exceed the SVG boundary */
+      overflow: visible;
+    }
+
+    /* Tolerance zone ring — separate div, absolutely positioned inside .target-circle */
+    .tol-zone {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(99, 179, 237, 0.4);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* ── HUD panel (top-right) ── */
+    #hud {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(13, 17, 23, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 18px 20px;
+      width: 270px;
+      backdrop-filter: blur(10px);
+      z-index: 800;
+    }
+
+    .hud-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #8b949e;
+      margin-bottom: 14px;
+    }
+
+    /* Tolerance row */
+    .tolerance-block {
+      background: #161b22;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .tolerance-block .tol-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .tol-label { font-size: 12px; color: #8b949e; }
+    .tol-ctrl  { display: flex; align-items: center; gap: 8px; }
+    .tol-btn {
+      width: 26px; height: 26px;
+      background: #21262d;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      color: #e6edf3;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.12s;
+    }
+    .tol-btn:hover { background: #30363d; }
+    .tol-val {
+      font-size: 16px;
+      font-weight: 700;
+      min-width: 52px;
+      text-align: center;
+      color: #58a6ff;
+    }
+    .tol-step-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 2px;
+    }
+    .tol-step-btn {
+      flex: 1;
+      padding: 3px 0;
+      font-size: 11px;
+      background: #0d1117;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 5px;
+      color: #8b949e;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.12s, color 0.12s;
+    }
+    .tol-step-btn.active {
+      background: rgba(88,166,255,0.15);
+      border-color: rgba(88,166,255,0.4);
+      color: #58a6ff;
+    }
+    .tol-step-btn:hover:not(.active) { background: #21262d; color: #e6edf3; }
+
+    /* Dwell time row */
+    .dwell-block {
+      background: #161b22;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .dwell-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .dwell-label { font-size: 12px; color: #8b949e; }
+
+    /* Stats */
+    .hud-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+    }
+    .hud-stat:last-of-type { border-bottom: none; }
+    .hud-stat .lbl { color: #8b949e; font-size: 12px; }
+    .hud-stat .val { font-weight: 700; font-size: 13px; }
+    .val.good { color: #3fb950; }
+    .val.warn { color: #e3b341; }
+    .val.bad  { color: #f85149; }
+
+    /* Control buttons */
+    .hud-btns {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .btn-sm {
+      flex: 1;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #21262d;
+      color: #e6edf3;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 7px;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.12s;
+    }
+    .btn-sm:hover:not(:disabled) { background: #30363d; }
+    .btn-sm:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-danger {
+      background: rgba(248, 81, 73, 0.15);
+      border-color: rgba(248, 81, 73, 0.4);
+      color: #f85149;
+    }
+    .btn-danger:hover:not(:disabled) { background: rgba(248, 81, 73, 0.25); }
+
+    /* Live error distance display */
+    #live-error {
+      text-align: center;
+      font-size: 11px;
+      color: #8b949e;
+      margin-top: 8px;
+    }
+    #live-error .dist { font-size: 15px; font-weight: 700; color: #58a6ff; }
+    #live-error .dist.in-zone { color: #3fb950; }
+
+    /* ── Results log (bottom-left) ── */
+    #results-panel {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      background: rgba(13, 17, 23, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 14px 16px;
+      width: 280px;
+      max-height: 230px;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+      z-index: 800;
+      display: none;
+    }
+    #results-panel.visible { display: block; }
+    .rp-title { font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 8px; }
+    .result-row {
+      display: grid;
+      grid-template-columns: 24px 20px 1fr 1fr;
+      gap: 6px;
+      align-items: center;
+      font-size: 12px;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .result-row:last-child { border-bottom: none; }
+    .r-n    { color: #8b949e; }
+    .r-ok   { color: #3fb950; font-weight: 700; }
+    .r-skip { color: #f85149; font-weight: 700; }
+    .r-err  { color: #e6edf3; }
+    .r-time { color: #8b949e; text-align: right; }
+
+    /* ── Intro overlay ── */
+    #intro-overlay {
+      position: fixed;
+      inset: 0;
+      background: #0d1117;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    .intro-card {
+      text-align: center;
+      max-width: 500px;
+      padding: 44px 40px;
+      background: linear-gradient(145deg, #161b22, #1c2128);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    }
+    .intro-card h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .intro-card .sub {
+      color: #8b949e;
+      font-size: 14px;
+      margin-bottom: 22px;
+      line-height: 1.7;
+    }
+
+    .how-to {
+      text-align: left;
+      background: rgba(88, 166, 255, 0.06);
+      border: 1px solid rgba(88, 166, 255, 0.18);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 22px;
+      font-size: 13px;
+      color: #8b949e;
+      line-height: 1.8;
+    }
+    .how-to strong { color: #58a6ff; }
+
+    .config-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #8b949e;
+    }
+    .config-row select {
+      background: #21262d;
+      color: #e6edf3;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 7px;
+      padding: 5px 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-primary {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 12px 32px;
+      background: #238636;
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #2ea043; }
+
+    /* ── Loading overlay ── */
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 17, 23, 0.96);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1900;
+    }
+    #loading-overlay.active { display: flex; }
+    .loading-inner { text-align: center; }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.08);
+      border-top-color: #58a6ff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Summary overlay ── */
+    #summary-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 17, 23, 0.96);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1800;
+    }
+    #summary-overlay.active { display: flex; }
+    .summary-card {
+      text-align: center;
+      max-width: 540px;
+      width: 92vw;
+      background: #161b22;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 36px 36px 28px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    }
+    .summary-card h2 { font-size: 1.7rem; margin-bottom: 6px; }
+    .summary-card .sub { color: #8b949e; margin-bottom: 24px; font-size: 14px; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .sum-stat {
+      background: #0d1117;
+      border-radius: 10px;
+      padding: 14px 10px;
+    }
+    .sum-stat .sv { font-size: 1.8rem; font-weight: 800; color: #58a6ff; }
+    .sum-stat .sl { font-size: 11px; color: #8b949e; margin-top: 4px; }
+
+    /* Histogram */
+    .error-chart {
+      background: #0d1117;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 18px;
+      text-align: left;
+    }
+    .chart-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 5px 0;
+      font-size: 12px;
+    }
+    .bar-lbl  { width: 64px; color: #8b949e; font-size: 11px; text-align: right; flex-shrink: 0; }
+    .bar-fill { height: 14px; background: #1f6feb; border-radius: 3px; min-width: 2px; transition: width 0.5s ease; }
+    .bar-fill.highlight { background: #58a6ff; }
+    .bar-n    { color: #8b949e; font-size: 11px; }
+
+    /* Recommendation box */
+    .recommendation {
+      background: rgba(56, 139, 253, 0.08);
+      border: 1px solid rgba(56, 139, 253, 0.25);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #8b949e;
+      text-align: left;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+    .recommendation strong { color: #58a6ff; }
+
+    .summary-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .summary-btns .btn-primary { margin-top: 0; }
+    .summary-btns .btn-sm { flex: none; padding: 10px 20px; font-size: 14px; }
+
+    /* ── WebGazer video override — top-left camera panel ── */
+    #webgazerVideoContainer {
+      position: fixed !important;
+      top: 16px !important;
+      left: 16px !important;
+      bottom: auto !important;
+      right: auto !important;
+      z-index: 700 !important;
+      border-radius: 8px !important;
+      overflow: hidden !important;
+    }
+
+    /* ── Status log (bottom-left) ── */
+    #status-log {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(13, 17, 23, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 12px 14px;
+      width: 310px;
+      max-height: 200px;
+      backdrop-filter: blur(10px);
+      z-index: 800;
+      display: flex;
+      flex-direction: column;
+    }
+    .sl-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+    .sl-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #8b949e;
+    }
+    .sl-clear-btn {
+      font-size: 10px;
+      padding: 2px 8px;
+      background: #21262d;
+      color: #8b949e;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .sl-clear-btn:hover { background: #30363d; color: #e6edf3; }
+    #status-log-list { overflow-y: auto; flex: 1; }
+    .sl-entry {
+      font-size: 11px;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      line-height: 1.5;
+      display: flex;
+      gap: 6px;
+    }
+    .sl-entry:last-child { border-bottom: none; }
+    .sl-time { color: #444d58; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+    .sl-msg.blink    { color: #e3b341; }
+    .sl-msg.artifact { color: #f85149; }
+    .sl-msg.accuracy { color: #58a6ff; }
+    .sl-msg.info     { color: #8b949e; }
+
+    /* ── Accuracy banner (top strip) ── */
+    #accuracy-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 34px;
+      background: rgba(13, 17, 23, 0.96);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      z-index: 850;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-size: 12px;
+    }
+    #accuracy-banner.visible { display: flex; }
+    .acc-banner-label { color: #8b949e; }
+    .acc-banner-val { font-weight: 700; font-size: 14px; }
+
+    /* ── Overrides for this page ── */
+    /* Push settings gear + panel below HUD so they don't overlap */
+    .gear-btn {
+      top: auto !important;
+      bottom: 20px !important;
+      right: 20px !important;
+    }
+    .settings-panel {
+      top: auto !important;
+      bottom: 66px !important;
+      right: 16px !important;
+    }
+    /* Face-info badge: bottom-right, clear of camera feed */
+    #face-info-badge {
+      bottom: 16px !important;
+      right: 16px !important;
+      top: auto !important;
+      left: auto !important;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Accuracy banner -->
+<div id="accuracy-banner">
+  <span class="acc-banner-label">Last Calibration Check:</span>
+  <span class="acc-banner-val" id="acc-banner-val">—</span>
+  <span class="acc-banner-label" id="acc-banner-detail"></span>
+</div>
+
+<!-- Gaze dot -->
+<div id="gaze-dot"></div>
+
+<!-- Face-tracking debug overlays (same IDs as calibration.html) -->
+<div id="face-boundary-box"></div>
+<div id="position-warning">
+  <span id="position-warning-text">Move back to calibration position</span>
+</div>
+<div id="face-info-badge" class="visible">
+  <div class="fi-label">Face Position</div>
+  <div class="fi-row">
+    <span>Offset: <span id="fi-offset" class="fi-val ok">0px</span></span>
+    <span>Depth:  <span id="fi-depth"  class="fi-val ok">100%</span></span>
+    <span>Status: <span id="fi-status" class="fi-val ok">OK</span></span>
+  </div>
+</div>
+
+<!-- Recalibration overlay (same structure as calibration.html) -->
+<div id="recalibrate-overlay" role="alertdialog" aria-modal="true">
+  <div class="recalibrate-card">
+    <div class="icon" aria-hidden="true">&#128065;</div>
+    <h3 id="recalibrate-title">Accuracy Check Required</h3>
+    <p id="recalibrate-message">Your face position has shifted significantly. Please look at the center dot to recheck accuracy.</p>
+    <div id="recalibrate-accuracy" class="accuracy-value" style="display:none"></div>
+    <div class="recheck-btn-row">
+      <button id="recheck-btn" class="btn btn-primary">Look at Center &amp; Recheck</button>
+      <button id="force-recalibrate-btn" class="btn btn-danger-sm">Full Recalibration</button>
+    </div>
+  </div>
+</div>
+
+<!-- Game area — target circles injected here -->
+<div id="game-area"></div>
+
+<!-- ── HUD ── -->
+<div id="hud">
+  <div class="hud-title">Gaze Accuracy Test</div>
+
+  <!-- Tolerance control -->
+  <div class="tolerance-block">
+    <div class="tol-header">
+      <span class="tol-label">Tolerance Radius</span>
+      <div class="tol-ctrl">
+        <button class="tol-btn" id="tol-minus" aria-label="Decrease tolerance">−</button>
+        <div class="tol-val"><span id="tol-value">80</span> px</div>
+        <button class="tol-btn" id="tol-plus"  aria-label="Increase tolerance">+</button>
+      </div>
+    </div>
+    <div class="tol-step-row">
+      <button class="tol-step-btn" data-step="5">±5</button>
+      <button class="tol-step-btn active" data-step="10">±10</button>
+      <button class="tol-step-btn" data-step="20">±20</button>
+      <button class="tol-step-btn" data-step="50">±50</button>
+    </div>
+  </div>
+
+  <!-- Dwell time control -->
+  <div class="dwell-block">
+    <div class="dwell-header">
+      <span class="dwell-label">Dwell Time Required</span>
+      <div class="tol-ctrl">
+        <button class="tol-btn" id="dwell-minus" aria-label="Decrease dwell time">−</button>
+        <div class="tol-val"><span id="dwell-value">2.5</span> s</div>
+        <button class="tol-btn" id="dwell-plus"  aria-label="Increase dwell time">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live gaze distance -->
+  <div id="live-error">
+    Gaze distance: <span class="dist" id="live-dist">— px</span>
+  </div>
+
+  <!-- Stats -->
+  <div style="margin-top: 10px;">
+    <div class="hud-stat">
+      <span class="lbl">Progress</span>
+      <span class="val" id="stat-progress">— / —</span>
+    </div>
+    <div class="hud-stat">
+      <span class="lbl">Success Rate</span>
+      <span class="val" id="stat-success">—</span>
+    </div>
+    <div class="hud-stat">
+      <span class="lbl">Avg Gaze Error</span>
+      <span class="val" id="stat-error">— px</span>
+    </div>
+    <div class="hud-stat">
+      <span class="lbl">Last Circle Error</span>
+      <span class="val" id="stat-last">— px</span>
+    </div>
+    <div class="hud-stat">
+      <span class="lbl">Blinks Detected</span>
+      <span class="val" id="stat-blinks">0</span>
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="hud-btns">
+    <button class="btn-sm" id="skip-btn" disabled>Skip</button>
+    <button class="btn-sm btn-danger" id="stop-btn" disabled>Stop</button>
+  </div>
+  <div class="hud-btns" style="margin-top: 6px;">
+    <button class="btn-sm" id="recheck-cal-btn">⟳ Recheck Calibration</button>
+  </div>
+</div>
+
+<!-- ── Status log ── -->
+<div id="status-log">
+  <div class="sl-header">
+    <span class="sl-title">Status Log</span>
+    <button class="sl-clear-btn" id="clear-log-btn">Clear</button>
+  </div>
+  <div id="status-log-list"></div>
+</div>
+
+<!-- ── Intro overlay ── -->
+<div id="intro-overlay">
+  <div class="intro-card">
+    <h1>Gaze Accuracy Test</h1>
+    <p class="sub">
+      Circles appear one at a time. <strong>Look at each circle</strong> — once your
+      gaze stays within the tolerance zone for the required dwell time, it disappears
+      and the next one appears.
+    </p>
+
+    <div class="how-to">
+      <strong>How to use:</strong><br>
+      1. Start the test — a circle appears on screen<br>
+      2. Look at the circle; the ring fills up as it detects your gaze<br>
+      3. If circles aren't detected, <strong>increase the tolerance radius</strong> (+)<br>
+      4. The minimum tolerance where most circles succeed = your tracking error margin<br>
+      5. The <em>blue dashed ring</em> around each circle shows the current tolerance zone
+    </div>
+
+    <div class="config-row">
+      <label for="round-size">Circles per round:</label>
+      <select id="round-size">
+        <option value="10">10</option>
+        <option value="15" selected>15</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+      </select>
+    </div>
+
+    <button class="btn-primary" id="start-btn">Start Test</button>
+  </div>
+</div>
+
+<!-- ── Loading overlay ── -->
+<div id="loading-overlay">
+  <div class="loading-inner">
+    <div class="spinner"></div>
+    <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Initializing Eye Tracking…</div>
+    <div style="font-size: 13px; color: #8b949e;">Please allow camera access when prompted.</div>
+  </div>
+</div>
+
+<!-- ── Summary overlay ── -->
+<div id="summary-overlay">
+  <div class="summary-card">
+    <h2>Round Complete!</h2>
+    <p class="sub">Gaze accuracy results for this session</p>
+
+    <div class="summary-grid">
+      <div class="sum-stat">
+        <div class="sv" id="sum-success">—</div>
+        <div class="sl">Success Rate</div>
+      </div>
+      <div class="sum-stat">
+        <div class="sv" id="sum-avg-err">—</div>
+        <div class="sl">Avg Error (px)</div>
+      </div>
+      <div class="sum-stat">
+        <div class="sv" id="sum-tolerance">—</div>
+        <div class="sl">Tolerance Used</div>
+      </div>
+    </div>
+
+    <!-- Error distance histogram -->
+    <div class="error-chart">
+      <div class="chart-title">Gaze Error Distribution (px from circle center)</div>
+      <div id="error-histogram"></div>
+    </div>
+
+    <!-- Recommendation -->
+    <div class="recommendation" id="recommendation"></div>
+
+    <div class="summary-btns">
+      <button class="btn-primary" id="again-btn">Play Again</button>
+      <button class="btn-sm" id="adjust-btn">Adjust &amp; Replay</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/state.js"></script>
+<script src="js/face-tracking.js"></script>
+<script src="js/settings-panel.js"></script>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ────────────────────────────────────────
+     Constants
+  ──────────────────────────────────────── */
+  const CIRCLE_RADIUS = 30;       // px — visual target radius
+  const R_RING        = 24;       // px — SVG progress ring radius
+  const CIRC_RING     = +(2 * Math.PI * R_RING).toFixed(2); // ≈ 150.8
+  const SVG_SIZE      = (CIRCLE_RADIUS + 8) * 2; // px — SVG bounding box
+  const MARGIN        = 100;      // px — minimum distance from screen edge for circle spawning
+  const DWELL_DECAY   = 0.4;      // rate of dwell loss when gaze is outside tolerance (fraction of gain rate)
+  const DWELL_STEP    = 0.5;      // seconds per dwell ±click
+
+  /* ────────────────────────────────────────
+     DOM refs
+  ──────────────────────────────────────── */
+  const gameArea       = document.getElementById('game-area');
+  const gazeDotEl      = document.getElementById('gaze-dot');
+  const introOvl       = document.getElementById('intro-overlay');
+  const loadingOvl     = document.getElementById('loading-overlay');
+  const summaryOvl     = document.getElementById('summary-overlay');
+
+  const startBtn       = document.getElementById('start-btn');
+  const skipBtn        = document.getElementById('skip-btn');
+  const stopBtn        = document.getElementById('stop-btn');
+  const againBtn       = document.getElementById('again-btn');
+  const adjustBtn      = document.getElementById('adjust-btn');
+
+  const tolMinusBtn    = document.getElementById('tol-minus');
+  const tolPlusBtn     = document.getElementById('tol-plus');
+  const tolValueEl     = document.getElementById('tol-value');
+  const tolStepBtns    = document.querySelectorAll('.tol-step-btn');
+
+  const dwellMinusBtn  = document.getElementById('dwell-minus');
+  const dwellPlusBtn   = document.getElementById('dwell-plus');
+  const dwellValueEl   = document.getElementById('dwell-value');
+
+  const roundSizeSel   = document.getElementById('round-size');
+
+  const statProgress   = document.getElementById('stat-progress');
+  const statSuccess    = document.getElementById('stat-success');
+  const statError      = document.getElementById('stat-error');
+  const statLast       = document.getElementById('stat-last');
+  const liveDistEl     = document.getElementById('live-dist');
+
+  const resultsPanel   = null; // removed — results shown in status log
+  const resultsList    = null;
+
+  const statusLogList  = document.getElementById('status-log-list');
+  const accuracyBannerEl  = document.getElementById('accuracy-banner');
+  const accBannerValEl    = document.getElementById('acc-banner-val');
+  const accBannerDetailEl = document.getElementById('acc-banner-detail');
+  const statBlinksEl      = document.getElementById('stat-blinks');
+  const recheckCalBtn     = document.getElementById('recheck-cal-btn');
+  const clearLogBtn       = document.getElementById('clear-log-btn');
+
+  const sumSuccessEl   = document.getElementById('sum-success');
+  const sumAvgErrEl    = document.getElementById('sum-avg-err');
+  const sumToleranceEl = document.getElementById('sum-tolerance');
+  const errorHistogram = document.getElementById('error-histogram');
+  const recommendEl    = document.getElementById('recommendation');
+
+  /* ────────────────────────────────────────
+     CalApp face-tracking wiring
+     Must be done before initWebGazer so that face-tracking.js can use
+     these references immediately when monitoring starts.
+  ──────────────────────────────────────── */
+  CalApp.dom.gazeDot             = gazeDotEl;
+  CalApp.dom.faceBoundaryBox     = document.getElementById('face-boundary-box');
+  CalApp.dom.faceInfoBadge       = document.getElementById('face-info-badge');
+  CalApp.dom.fiOffset            = document.getElementById('fi-offset');
+  CalApp.dom.fiDepth             = document.getElementById('fi-depth');
+  CalApp.dom.fiStatus            = document.getElementById('fi-status');
+  CalApp.dom.positionWarning     = document.getElementById('position-warning');
+  CalApp.dom.positionWarningText = document.getElementById('position-warning-text');
+  CalApp.dom.recalibrateOvl      = document.getElementById('recalibrate-overlay');
+  CalApp.dom.recalibrateTitle    = document.getElementById('recalibrate-title');
+  CalApp.dom.recalibrateMsg      = document.getElementById('recalibrate-message');
+  CalApp.dom.recalibrateAccuracy = document.getElementById('recalibrate-accuracy');
+  CalApp.dom.recheckBtn          = document.getElementById('recheck-btn');
+  // stat-accuracy doesn't exist on this page; stub so evaluateRecheck won't crash
+  CalApp.dom.statAcc = { textContent: '' };
+
+  // After performAccuracyRecheck completes, restore the game gaze listener
+  // and resume face monitoring (replaces calibration-only startGazeDemo).
+  CalApp.startGazeDemo = function () {
+    if (typeof gameGazeListener === 'function') {
+      webgazer.setGazeListener(gameGazeListener);
+    }
+    CalApp.startFaceMonitoring();
+  };
+
+  // Override: face drift detected — show the position-warning toast only,
+  // do NOT pop the full recalibrate overlay on this page.
+  CalApp.triggerAccuracyRecheck = function () {
+    CalApp.state.isRechecking = false; // don't block face monitoring
+    CalApp.state.dangerStartTime = 0;
+    // position-warning is already managed by face-tracking CSS; just let it appear briefly
+  };
+
+  // Override: after manual recheck, show result in top banner; never redirect to calibration.
+  CalApp.evaluateRecheck = function () {
+    var s   = CalApp.state;
+    var cx  = window.innerWidth  / 2;
+    var cy  = window.innerHeight / 2;
+    var samples = s.recheckSamples || [];
+    s.recheckSamples = null;
+
+    if (samples.length === 0) {
+      s.isRechecking = false;
+      CalApp.startGazeDemo();
+      return;
+    }
+
+    if (samples.length > 10) samples = samples.slice(Math.floor(samples.length * 0.4));
+
+    var avgErr = samples.reduce(function (acc, pt) {
+      var dx = pt.x - cx, dy = pt.y - cy;
+      return acc + Math.sqrt(dx * dx + dy * dy);
+    }, 0) / samples.length;
+
+    var maxDist = Math.sqrt(
+      window.innerWidth  * window.innerWidth +
+      window.innerHeight * window.innerHeight
+    );
+    var acc = Math.max(0, Math.min(100, 100 - (avgErr / maxDist) * 190));
+    s.lastAccuracy = acc;
+    s.isRechecking  = false;
+
+    // 80th-percentile distance across samples for tolerance estimate
+    var dists  = samples.map(function (pt) { return Math.sqrt(Math.pow(pt.x - cx, 2) + Math.pow(pt.y - cy, 2)); })
+                        .sort(function (a, b) { return a - b; });
+    var tol80  = Math.round(dists[Math.floor(dists.length * 0.8)] || 0);
+    var avgErrPx = avgErr.toFixed(1);
+
+    // Apply tol80 as the new tolerance radius
+    if (tol80 > 0) {
+      toleranceRadius = Math.max(15, Math.min(400, tol80));
+      tolValueEl.textContent = toleranceRadius;
+      if (currentCircle) updateTolZone(currentCircle.el, toleranceRadius);
+    }
+
+    // Show in top banner
+    var pctStr = acc.toFixed(1) + '%';
+    var colorClass = acc >= 80 ? 'good' : acc >= 60 ? 'warn' : 'bad';
+    accBannerValEl.textContent = pctStr;
+    accBannerValEl.className   = 'acc-banner-val val ' + colorClass;
+    accBannerDetailEl.textContent = '| avg err ' + avgErrPx + 'px | tol set to ' + toleranceRadius + 'px';
+    accuracyBannerEl.classList.add('visible');
+
+    addStatusLog('Recheck: ' + pctStr + ' | avg err ' + avgErrPx + 'px | tol auto-set to ' + toleranceRadius + 'px (n=' + samples.length + ')', 'accuracy');
+
+    // Capture fresh face reference and resume — no redirect regardless of accuracy
+    CalApp.captureFaceReference(function (ref) { if (ref) s.faceReference = ref; });
+    CalApp.startGazeDemo();
+  };
+
+  /* ────────────────────────────────────────
+     State
+  ──────────────────────────────────────── */
+  let toleranceRadius  = 80;      // px — adjustable
+  let tolStep          = 10;      // px per click
+  let dwellRequired    = 2500;    // ms — adjustable
+  let roundSize        = 15;
+
+  let gazeX = window.innerWidth  / 2;
+  let gazeY = window.innerHeight / 2;
+
+  let isRunning        = false;
+  let currentCircle    = null;   // { x, y, el, dwellMs, allSamples, inZoneSamples, startTime }
+  let circlesDone      = 0;
+  let circleResults    = [];     // [{ success, avgAllError, avgInZoneError, time, tolerance }]
+
+  let rafId            = null;
+  let lastTick         = null;
+
+  /* ── Blink detection ── */
+  let blinkCount       = 0;
+  let blinkNullCount   = 0;
+  let prevGazeY        = null;
+  let lastBlinkTime    = 0;
+  const BLINK_NULL_THRESHOLD = 4;
+  const BLINK_DROP_THRESHOLD = 90;
+  const BLINK_COOLDOWN       = 600;
+
+  /* ────────────────────────────────────────
+     Tolerance step selector
+  ──────────────────────────────────────── */
+  tolStepBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tolStep = parseInt(btn.dataset.step, 10);
+      tolStepBtns.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+    });
+  });
+
+  /* ────────────────────────────────────────
+     Tolerance controls
+  ──────────────────────────────────────── */
+  tolMinusBtn.addEventListener('click', function () {
+    toleranceRadius = Math.max(15, toleranceRadius - tolStep);
+    tolValueEl.textContent = toleranceRadius;
+    if (currentCircle) updateTolZone(currentCircle.el, toleranceRadius);
+  });
+  tolPlusBtn.addEventListener('click', function () {
+    toleranceRadius = Math.min(400, toleranceRadius + tolStep);
+    tolValueEl.textContent = toleranceRadius;
+    if (currentCircle) updateTolZone(currentCircle.el, toleranceRadius);
+  });
+
+  /* ────────────────────────────────────────
+     Dwell time controls
+  ──────────────────────────────────────── */
+  dwellMinusBtn.addEventListener('click', function () {
+    var newDwell = Math.max(0.5, parseFloat(dwellValueEl.textContent) - DWELL_STEP);
+    dwellValueEl.textContent = newDwell.toFixed(1);
+    dwellRequired = newDwell * 1000;
+  });
+  dwellPlusBtn.addEventListener('click', function () {
+    var newDwell = Math.min(10.0, parseFloat(dwellValueEl.textContent) + DWELL_STEP);
+    dwellValueEl.textContent = newDwell.toFixed(1);
+    dwellRequired = newDwell * 1000;
+  });
+
+  /* ────────────────────────────────────────
+     Circle creation helpers
+  ──────────────────────────────────────── */
+  function updateTolZone(el, r) {
+    var tolDiv = el.querySelector('.tol-zone');
+    if (!tolDiv) return;
+    var d = r * 2;
+    tolDiv.style.width  = d + 'px';
+    tolDiv.style.height = d + 'px';
+  }
+
+  function createCircleEl(x, y) {
+    var el = document.createElement('div');
+    el.className    = 'target-circle';
+    el.style.left   = x + 'px';
+    el.style.top    = y + 'px';
+    el.style.width  = SVG_SIZE + 'px';
+    el.style.height = SVG_SIZE + 'px';
+
+    var cx = SVG_SIZE / 2;
+    var cy = SVG_SIZE / 2;
+
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + SVG_SIZE + ' ' + SVG_SIZE);
+    svg.setAttribute('width',  SVG_SIZE);
+    svg.setAttribute('height', SVG_SIZE);
+
+    // Background fill circle
+    var bg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    bg.setAttribute('cx', cx);
+    bg.setAttribute('cy', cy);
+    bg.setAttribute('r',  R_RING);
+    bg.setAttribute('fill', 'rgba(239,68,68,0.12)');
+    bg.setAttribute('stroke', '#ef4444');
+    bg.setAttribute('stroke-width', '2');
+
+    // Progress ring
+    var ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ring.setAttribute('cx', cx);
+    ring.setAttribute('cy', cy);
+    ring.setAttribute('r',  R_RING);
+    ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', '#22c55e');
+    ring.setAttribute('stroke-width', '5');
+    ring.setAttribute('stroke-dasharray', CIRC_RING);
+    ring.setAttribute('stroke-dashoffset', CIRC_RING);
+    ring.setAttribute('stroke-linecap', 'round');
+    ring.setAttribute('transform', 'rotate(-90 ' + cx + ' ' + cy + ')');
+    ring.classList.add('prog-ring');
+
+    // Center label (shows progress % or distance)
+    var lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    lbl.setAttribute('x', cx);
+    lbl.setAttribute('y', cy + 4);
+    lbl.setAttribute('text-anchor', 'middle');
+    lbl.setAttribute('dominant-baseline', 'middle');
+    lbl.setAttribute('font-size', '10');
+    lbl.setAttribute('font-family', 'system-ui, sans-serif');
+    lbl.setAttribute('font-weight', '700');
+    lbl.setAttribute('fill', '#94a3b8');
+    lbl.classList.add('prog-lbl');
+
+    svg.appendChild(bg);
+    svg.appendChild(ring);
+    svg.appendChild(lbl);
+    el.appendChild(svg);
+
+    // Tolerance zone ring (separate div — can exceed SVG bounds)
+    var tolDiv = document.createElement('div');
+    tolDiv.className = 'tol-zone';
+    el.appendChild(tolDiv);
+    updateTolZone(el, toleranceRadius);
+
+    gameArea.appendChild(el);
+
+    // Animate in (pop)
+    el.style.opacity   = '0';
+    el.style.transform = 'translate(-50%, -50%) scale(0.4)';
+    el.style.transition = 'opacity 0.2s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        el.style.opacity   = '1';
+        el.style.transform = 'translate(-50%, -50%) scale(1)';
+      });
+    });
+
+    return el;
+  }
+
+  function setCircleProgress(el, fraction, distPx, inZone) {
+    var ring = el.querySelector('.prog-ring');
+    var lbl  = el.querySelector('.prog-lbl');
+
+    var offset = CIRC_RING * (1 - Math.min(1, fraction));
+    ring.setAttribute('stroke-dashoffset', offset.toFixed(2));
+
+    if (fraction >= 1) {
+      ring.setAttribute('stroke', '#4ade80');
+    } else if (fraction > 0.6) {
+      ring.setAttribute('stroke', '#86efac');
+    } else {
+      ring.setAttribute('stroke', '#22c55e');
+    }
+
+    if (inZone) {
+      lbl.setAttribute('fill', '#4ade80');
+      lbl.textContent = Math.round(fraction * 100) + '%';
+    } else {
+      lbl.setAttribute('fill', '#94a3b8');
+      lbl.textContent = Math.round(distPx) + 'px';
+    }
+  }
+
+  /* ────────────────────────────────────────
+     Game loop
+  ──────────────────────────────────────── */
+  function spawnCircle() {
+    // Always spawn at screen center for consistent accuracy measurement
+    var x = window.innerWidth  / 2;
+    var y = window.innerHeight / 2;
+
+    var el = createCircleEl(x, y);
+    currentCircle = {
+      x: x, y: y, el: el,
+      dwellMs:       0,
+      allSamples:    [],   // every gaze distance sample
+      inZoneSamples: [],   // samples only when inside tolerance
+      startTime:     Date.now(),
+    };
+    lastTick = performance.now();
+  }
+
+  function gameLoop(now) {
+    if (!isRunning) return;
+    if (!currentCircle) { rafId = requestAnimationFrame(gameLoop); return; }
+
+    var dt   = now - (lastTick || now);
+    lastTick = now;
+
+    var dx   = gazeX - currentCircle.x;
+    var dy   = gazeY - currentCircle.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    var inZone = (dist <= toleranceRadius);
+
+    // Record samples
+    currentCircle.allSamples.push(dist);
+    if (inZone) currentCircle.inZoneSamples.push(dist);
+
+    // Accumulate / decay dwell
+    if (inZone) {
+      currentCircle.dwellMs += dt;
+    } else {
+      currentCircle.dwellMs = Math.max(0, currentCircle.dwellMs - dt * DWELL_DECAY);
+    }
+
+    // Update circle visuals
+    var fraction = currentCircle.dwellMs / dwellRequired;
+    setCircleProgress(currentCircle.el, fraction, dist, inZone);
+
+    // Update live error display
+    liveDistEl.textContent = Math.round(dist) + ' px';
+    liveDistEl.className = 'dist' + (inZone ? ' in-zone' : '');
+
+    if (currentCircle.dwellMs >= dwellRequired) {
+      completeCircle(true);
+      return;
+    }
+
+    rafId = requestAnimationFrame(gameLoop);
+  }
+
+  function completeCircle(success) {
+    if (!currentCircle) return;
+    var c = currentCircle;
+    currentCircle = null;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+
+    // Animate out
+    c.el.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+    c.el.style.opacity    = '0';
+    c.el.style.transform  = 'translate(-50%, -50%) scale(1.35)';
+    setTimeout(function () { c.el.remove(); }, 200);
+
+    // Compute stats
+    var allAvg    = avg(c.allSamples);
+    var zoneAvg   = avg(c.inZoneSamples);
+    var elapsed   = Date.now() - c.startTime;
+
+    circleResults.push({
+      success:      success,
+      avgAllError:  allAvg,
+      avgZoneError: zoneAvg,
+      time:         elapsed,
+      tolerance:    toleranceRadius,
+    });
+    circlesDone++;
+
+    // Log result in status log instead of separate panel
+    addStatusLog(
+      '#' + circlesDone + ' ' + (success ? '✓' : '✗') +
+      ' | err ' + allAvg.toFixed(1) + 'px' +
+      ' | tol ' + toleranceRadius + 'px' +
+      ' | ' + (elapsed / 1000).toFixed(1) + 's',
+      success ? 'accuracy' : 'info'
+    );
+
+    // Update HUD last-circle error
+    statLast.textContent = allAvg.toFixed(1) + ' px';
+
+    updateHUD();
+
+    if (circlesDone >= roundSize) {
+      setTimeout(showSummary, 450);
+      return;
+    }
+
+    // Spawn next circle after a brief gap
+    setTimeout(function () {
+      if (isRunning) {
+        spawnCircle();
+        rafId = requestAnimationFrame(gameLoop);
+      }
+    }, 550);
+  }
+
+  function avg(arr) {
+    if (!arr || arr.length === 0) return 0;
+    return arr.reduce(function (s, v) { return s + v; }, 0) / arr.length;
+  }
+
+  /* ────────────────────────────────────────
+     HUD updates
+  ──────────────────────────────────────── */
+  function updateHUD() {
+    var done      = circleResults.length;
+    var succeeded = circleResults.filter(function (r) { return r.success; }).length;
+    statProgress.textContent = done + ' / ' + roundSize;
+
+    if (done === 0) return;
+
+    var rate = (succeeded / done * 100).toFixed(0);
+    statSuccess.textContent = rate + '%';
+    statSuccess.className   = 'val ' + (rate >= 80 ? 'good' : rate >= 50 ? 'warn' : 'bad');
+
+    // Average error across all circles (regardless of success)
+    var totalAvg = avg(circleResults.map(function (r) { return r.avgAllError; }));
+    statError.textContent = totalAvg.toFixed(1) + ' px';
+    statError.className   = 'val ' + (totalAvg <= 60 ? 'good' : totalAvg <= 120 ? 'warn' : 'bad');
+  }
+
+  /* ────────────────────────────────────────
+     Summary screen
+  ──────────────────────────────────────── */
+  function showSummary() {
+    stopGame(false);
+    summaryOvl.classList.add('active');
+
+    var done      = circleResults.length;
+    var succeeded = circleResults.filter(function (r) { return r.success; }).length;
+    var rate      = done > 0 ? (succeeded / done * 100).toFixed(0) : 0;
+
+    // Average error over ALL circles (full picture of tracking accuracy)
+    var allErrors  = circleResults.map(function (r) { return r.avgAllError; });
+    var globalAvg  = avg(allErrors).toFixed(1);
+
+    sumSuccessEl.textContent   = rate + '%';
+    sumAvgErrEl.textContent    = globalAvg + ' px';
+    sumToleranceEl.textContent = toleranceRadius + ' px';
+
+    // Histogram — 6 buckets
+    var bins = [
+      { label: '0–40px',   min: 0,   max: 40,  count: 0 },
+      { label: '40–80px',  min: 40,  max: 80,  count: 0 },
+      { label: '80–120px', min: 80,  max: 120, count: 0 },
+      { label: '120–160px',min: 120, max: 160, count: 0 },
+      { label: '160–200px',min: 160, max: 200, count: 0 },
+      { label: '200px+',   min: 200, max: Infinity, count: 0 },
+    ];
+    allErrors.forEach(function (e) {
+      for (var i = 0; i < bins.length; i++) {
+        if (e >= bins[i].min && e < bins[i].max) { bins[i].count++; break; }
+      }
+    });
+
+    var maxCount = Math.max.apply(null, bins.map(function (b) { return b.count; }).concat([1]));
+
+    // Find the peak bucket to highlight it
+    var peakIdx = 0;
+    bins.forEach(function (b, i) { if (b.count > bins[peakIdx].count) peakIdx = i; });
+
+    errorHistogram.innerHTML = bins.map(function (b, i) {
+      var w = Math.round(b.count / maxCount * 180);
+      return '<div class="bar-row">' +
+               '<div class="bar-lbl">' + b.label + '</div>' +
+               '<div class="bar-fill' + (i === peakIdx ? ' highlight' : '') + '" style="width:' + w + 'px"></div>' +
+               '<div class="bar-n">' + b.count + '</div>' +
+             '</div>';
+    }).join('');
+
+    // Recommendation
+    var r = parseFloat(globalAvg);
+    var rec = '';
+    if (parseFloat(rate) >= 90 && r <= 80) {
+      rec = '<strong>Great accuracy!</strong> Your current tolerance of ' + toleranceRadius + 'px works well. ' +
+            'The typical gaze error is ~' + globalAvg + 'px — you can design games with a ' +
+            Math.round(r * 1.5) + '–' + Math.round(r * 2) + 'px hit radius for a reliable experience.';
+    } else if (parseFloat(rate) >= 70) {
+      rec = '<strong>Moderate accuracy.</strong> Average error ~' + globalAvg + 'px. ' +
+            'Try <strong>increasing tolerance to ' + (toleranceRadius + 20) + '–' + (toleranceRadius + 40) + 'px</strong> ' +
+            'to improve detection. Consider a minimum game hit radius of ~' + Math.round(r * 2) + 'px.';
+    } else {
+      rec = '<strong>Low success rate.</strong> Average error ~' + globalAvg + 'px. ' +
+            'WebGazer accuracy may need recalibration, or you may need to <strong>run calibration.html first</strong>. ' +
+            'Try tolerance ≥ ' + Math.round(r) + 'px for reliable detection.';
+    }
+    recommendEl.innerHTML = rec;
+  }
+
+  /* ────────────────────────────────────────
+     Start / stop
+  ──────────────────────────────────────── */
+  function startGame() {
+    roundSize     = parseInt(roundSizeSel.value, 10);
+    circlesDone   = 0;
+    circleResults = [];
+    liveDistEl.textContent = '— px';
+    liveDistEl.className   = 'dist';
+    statProgress.textContent = '0 / ' + roundSize;
+    statSuccess.textContent  = '—';
+    statError.textContent    = '— px';
+    statLast.textContent     = '— px';
+    blinkCount = 0;
+    prevGazeY  = null;
+    statBlinksEl.textContent = '0';
+
+    isRunning = true;
+    skipBtn.disabled = false;
+    stopBtn.disabled = false;
+    gazeDotEl.classList.add('visible');
+    // Set initial dot position to centre so it doesn't flash at 0,0 before first prediction
+    gazeDotEl.style.left = (window.innerWidth  / 2) + 'px';
+    gazeDotEl.style.top  = (window.innerHeight / 2) + 'px';
+
+    spawnCircle();
+    rafId = requestAnimationFrame(gameLoop);
+  }
+
+  function stopGame(removeCircle) {
+    isRunning = false;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    if (removeCircle !== false && currentCircle) {
+      currentCircle.el.remove();
+      currentCircle = null;
+    }
+    skipBtn.disabled = true;
+    stopBtn.disabled = true;
+  }
+
+  /* ────────────────────────────────────────
+     Status log helpers
+  ──────────────────────────────────────── */
+  var MAX_LOG_ENTRIES = 60;
+  function addStatusLog(msg, type) {
+    var now = new Date();
+    var ts  = now.getHours().toString().padStart(2, '0') + ':' +
+              now.getMinutes().toString().padStart(2, '0') + ':' +
+              now.getSeconds().toString().padStart(2, '0') + '.' +
+              Math.floor(now.getMilliseconds() / 100);
+    var entry = document.createElement('div');
+    entry.className = 'sl-entry';
+    entry.innerHTML = '<span class="sl-time">' + ts + '</span>' +
+                      '<span class="sl-msg ' + (type || 'info') + '">' + msg + '</span>';
+    statusLogList.insertBefore(entry, statusLogList.firstChild);
+    while (statusLogList.children.length > MAX_LOG_ENTRIES) {
+      statusLogList.removeChild(statusLogList.lastChild);
+    }
+  }
+
+  /* ────────────────────────────────────────
+     Game gaze listener (named so it can be restored after recheck)
+  ──────────────────────────────────────── */
+  function gameGazeListener(data) {
+    if (!data) {
+      blinkNullCount++;
+      if (blinkNullCount === BLINK_NULL_THRESHOLD) {
+        var now = Date.now();
+        if (now - lastBlinkTime > BLINK_COOLDOWN) {
+          blinkCount++;
+          lastBlinkTime = now;
+          statBlinksEl.textContent = blinkCount;
+          addStatusLog('Blink (tracking lost \xd7' + BLINK_NULL_THRESHOLD + ')', 'blink');
+        }
+      }
+      return;
+    }
+    // Skip the first frame after a blink to avoid artifact position
+    if (blinkNullCount >= BLINK_NULL_THRESHOLD) {
+      blinkNullCount = 0;
+      prevGazeY = null;
+      return;
+    }
+    blinkNullCount = 0;
+    // Detect sudden large downward jump — eyelid artifact
+    if (prevGazeY !== null) {
+      var dy = data.y - prevGazeY;
+      if (dy > BLINK_DROP_THRESHOLD) {
+        var now2 = Date.now();
+        if (now2 - lastBlinkTime > BLINK_COOLDOWN) {
+          blinkCount++;
+          lastBlinkTime = now2;
+          statBlinksEl.textContent = blinkCount;
+          addStatusLog('Blink artifact: +' + dy.toFixed(0) + 'px downward jump', 'artifact');
+        }
+      }
+    }
+    prevGazeY = data.y;
+    var corrected = CalApp.computeGazeCorrection(data.x, data.y);
+    gazeX = corrected.x;
+    gazeY = corrected.y;
+    gazeDotEl.style.left = corrected.x + 'px';
+    gazeDotEl.style.top  = corrected.y + 'px';
+  }
+
+  /* ────────────────────────────────────────
+     Manual calibration accuracy measurement
+  ──────────────────────────────────────── */
+  function startAccuracyMeasurement() {
+    if (accMeasuring) return;
+    if (typeof webgazer === 'undefined' || typeof webgazer.setGazeListener !== 'function') {
+      addStatusLog('Eye tracking not ready \u2014 start the test first', 'info');
+      return;
+    }
+    accMeasuring = true;
+    var wasRunning = isRunning;
+    if (wasRunning) {
+      isRunning = false;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      if (currentCircle) { currentCircle.el.remove(); currentCircle = null; }
+    }
+
+    accSamples = [];
+    accMeasureOverlay.classList.add('active');
+    accMeasureBar.style.width = '0%';
+    accMeasureProgText.textContent = '3.0s remaining';
+
+    var cx        = window.innerWidth  / 2;
+    var cy        = window.innerHeight / 2;
+    var startTime = Date.now();
+
+    webgazer.setGazeListener(function (data) {
+      if (!data || !accMeasuring) return;
+      var dx = data.x - cx;
+      var dy = data.y - cy;
+      accSamples.push(Math.sqrt(dx * dx + dy * dy));
+      var elapsed   = Date.now() - startTime;
+      var fraction  = Math.min(1, elapsed / ACC_MEASURE_DURATION);
+      var remaining = Math.max(0, (ACC_MEASURE_DURATION - elapsed) / 1000);
+      accMeasureProgText.textContent = remaining.toFixed(1) + 's remaining';
+      accMeasureBar.style.width = (fraction * 100).toFixed(1) + '%';
+      if (elapsed >= ACC_MEASURE_DURATION) {
+        finishAccuracyMeasurement(wasRunning);
+      }
+    });
+
+    accMeasureTimer = setTimeout(function () {
+      finishAccuracyMeasurement(wasRunning);
+    }, ACC_MEASURE_DURATION + 200);
+  }
+
+  function finishAccuracyMeasurement(shouldResume) {
+    if (!accMeasuring) return;
+    accMeasuring = false;
+    if (accMeasureTimer) { clearTimeout(accMeasureTimer); accMeasureTimer = null; }
+    accMeasureOverlay.classList.remove('active');
+    webgazer.setGazeListener(gameGazeListener);
+
+    if (accSamples.length > 0) {
+      var withinTol = accSamples.filter(function (d) { return d <= toleranceRadius; }).length;
+      var accuracy  = (withinTol / accSamples.length * 100).toFixed(1);
+      var avgErr    = (accSamples.reduce(function (s, v) { return s + v; }, 0) / accSamples.length).toFixed(1);
+
+      // 80th-percentile error = tolerance radius needed for 80% hit-rate
+      var sorted = accSamples.slice().sort(function (a, b) { return a - b; });
+      var tol80  = Math.round(sorted[Math.floor(sorted.length * 0.8)] || 0);
+
+      statCalAccEl.textContent = accuracy + '% @ ' + toleranceRadius + 'px';
+      statCalAccEl.className   = 'val ' + (parseFloat(accuracy) >= 80 ? 'good' : parseFloat(accuracy) >= 60 ? 'warn' : 'bad');
+      statTolEstEl.textContent = tol80 + ' px';
+      statTolEstEl.className   = 'val';
+
+      addStatusLog(
+        accuracy + '% within ' + toleranceRadius + 'px | avg err ' + avgErr + 'px | 80%-tol \u2248 ' + tol80 + 'px (n=' + accSamples.length + ')',
+        'accuracy'
+      );
+    } else {
+      addStatusLog('Accuracy check: no samples collected', 'info');
+    }
+
+    if (shouldResume) {
+      isRunning = true;
+      spawnCircle();
+      rafId = requestAnimationFrame(gameLoop);
+    }
+  }
+
+  /* ────────────────────────────────────────
+     WebGazer initialisation
+  ──────────────────────────────────────── */
+  async function initWebGazer() {
+    if (typeof webgazer === 'undefined') {
+      throw new Error('webgazer.js not found. Ensure webgazer.js is in the same folder.');
+    }
+
+    // Fix MediaPipe FaceMesh assets path (load from CDN when local files are absent)
+    if (webgazer.params && typeof webgazer.params === 'object') {
+      webgazer.params.faceMeshSolutionPath =
+        'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh';
+    }
+
+    if (typeof webgazer.setRegression          === 'function') webgazer.setRegression('ridge');
+    if (typeof webgazer.setTracker             === 'function') webgazer.setTracker('TFFacemesh');
+    if (typeof webgazer.applyKalmanFilter      === 'function') webgazer.applyKalmanFilter(true);
+    if (typeof webgazer.saveDataAcrossSessions === 'function') webgazer.saveDataAcrossSessions(true);
+    if (typeof webgazer.showPredictionPoints   === 'function') webgazer.showPredictionPoints(false);
+    if (typeof webgazer.showVideoPreview       === 'function') webgazer.showVideoPreview(true);
+    if (typeof webgazer.showFaceOverlay        === 'function') webgazer.showFaceOverlay(true);
+    if (typeof webgazer.showFaceFeedbackBox    === 'function') webgazer.showFaceFeedbackBox(true);
+
+    webgazer.setGazeListener(gameGazeListener);
+
+    await webgazer.begin();
+
+    // Remove WebGazer's built-in mouse listeners so mouse movement/clicks
+    // do NOT feed into the regression model and override eye tracking.
+    if (typeof webgazer.removeMouseEventListeners === 'function') {
+      webgazer.removeMouseEventListeners();
+    }
+
+    // Capture baseline face position, then start continuous face monitoring
+    // so that range-check, offset-correction, and recheck overlay all work.
+    CalApp.captureFaceReference(function (ref) {
+      if (ref) CalApp.state.faceReference = ref;
+      CalApp.startFaceMonitoring();
+    });
+  }
+
+  /* ────────────────────────────────────────
+     Event listeners
+  ──────────────────────────────────────── */
+  startBtn.addEventListener('click', async function () {
+    introOvl.style.display = 'none';
+    loadingOvl.classList.add('active');
+    try {
+      await initWebGazer();
+      loadingOvl.classList.remove('active');
+      startGame();
+    } catch (e) {
+      loadingOvl.classList.remove('active');
+      introOvl.style.display = 'flex';
+      alert('Eye tracking initialization failed:\n' + (e.message || e));
+    }
+  });
+
+  skipBtn.addEventListener('click', function () {
+    if (!currentCircle || !isRunning) return;
+    completeCircle(false);
+  });
+
+  stopBtn.addEventListener('click', function () {
+    stopGame();
+    if (circleResults.length > 0) {
+      showSummary();
+    }
+  });
+
+  againBtn.addEventListener('click', function () {
+    summaryOvl.classList.remove('active');
+    startGame();
+  });
+
+  adjustBtn.addEventListener('click', function () {
+    summaryOvl.classList.remove('active');
+    // Stay on game screen — user can adjust tolerance in HUD then click skip to spawn new circle
+    // Spawn a fresh circle to allow immediate adjustment testing
+    if (typeof webgazer !== 'undefined' && typeof webgazer.resume === 'function') webgazer.resume();
+    circlesDone   = 0;
+    circleResults = [];
+    statProgress.textContent = '0 / ' + roundSize;
+    statSuccess.textContent  = '—';
+    statError.textContent    = '— px';
+    statLast.textContent     = '— px';
+    isRunning        = true;
+    skipBtn.disabled = false;
+    stopBtn.disabled = false;
+    spawnCircle();
+    rafId = requestAnimationFrame(gameLoop);
+  });
+
+  window.addEventListener('resize', function () {
+    // Circle is fixed at center; no off-screen check needed, but update position
+    if (currentCircle && isRunning) {
+      currentCircle.x = window.innerWidth  / 2;
+      currentCircle.y = window.innerHeight / 2;
+      currentCircle.el.style.left = currentCircle.x + 'px';
+      currentCircle.el.style.top  = currentCircle.y + 'px';
+    }
+  });
+
+  window.addEventListener('beforeunload', function () {
+    if (typeof webgazer !== 'undefined') {
+      try { webgazer.end(); } catch (_) {}
+    }
+  });
+
+  /* ────────────────────────────────────────
+     Recalibrate overlay button listeners
+  ──────────────────────────────────────── */
+  // "Look at Center & Recheck" — triggers CalApp.performAccuracyRecheck which
+  // collects 3 seconds of gaze samples and then calls CalApp.evaluateRecheck.
+  if (CalApp.dom.recheckBtn) {
+    CalApp.dom.recheckBtn.addEventListener('click', CalApp.performAccuracyRecheck);
+  }
+  // "Full Recalibration" — navigate back to the calibration page.
+  var forceRecalBtn = document.getElementById('force-recalibrate-btn');
+  if (forceRecalBtn) {
+    forceRecalBtn.addEventListener('click', function () {
+      window.location.href = 'calibration.html';
+    });
+  }
+
+  clearLogBtn.addEventListener('click', function () {
+    statusLogList.innerHTML = '';
+  });
+
+  // ⟳ Recheck Calibration button — shows overlay then runs CalApp.performAccuracyRecheck
+  if (recheckCalBtn) {
+    recheckCalBtn.addEventListener('click', function () {
+      if (CalApp.dom.recalibrateTitle)    CalApp.dom.recalibrateTitle.textContent = 'Calibration Accuracy Check';
+      if (CalApp.dom.recalibrateMsg)      CalApp.dom.recalibrateMsg.textContent   = 'Look at the gold dot to measure your current gaze accuracy. Results will appear in the top banner.';
+      if (CalApp.dom.recalibrateAccuracy) CalApp.dom.recalibrateAccuracy.style.display = 'none';
+      if (CalApp.dom.recheckBtn) {
+        CalApp.dom.recheckBtn.textContent    = 'Look at Center \u0026 Recheck';
+        CalApp.dom.recheckBtn.style.display  = '';
+      }
+      CalApp.state.isRechecking = true;
+      if (CalApp.dom.recalibrateOvl) CalApp.dom.recalibrateOvl.classList.add('active');
+    });
+  }
+
+  /* ────────────────────────────────────────
+     Settings panel
+  ──────────────────────────────────────── */
+  SettingsPanel.init({
+    alwaysVisible: true,
+    panelLabel: 'Settings',
+    sections: [
+      { type: 'toggle', id: 'gaze-dot', label: 'Gaze dot', initial: true,
+        onChange: function (on) {
+          gazeDotEl.style.display = on ? '' : 'none';
+        }
+      },
+      { type: 'toggle', id: 'camera', label: 'Camera preview', initial: true,
+        onChange: function (on) {
+          var el = document.getElementById('webgazerVideoContainer');
+          if (el) el.style.display = on ? '' : 'none';
+        }
+      },
+      { type: 'divider' },
+      { type: 'toggle', id: 'face-pos', label: 'Face positioning', initial: true,
+        onChange: function (on) {
+          var badge = CalApp.dom.faceInfoBadge;
+          var box   = CalApp.dom.faceBoundaryBox;
+          if (badge) badge.classList.toggle('visible', on);
+          if (box)   box.style.display = on ? '' : 'none';
+        }
+      },
+    ],
+  });
+
+})();
+</script>
+</body>
+</html>

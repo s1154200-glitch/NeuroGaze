@@ -1,0 +1,828 @@
+    /* ── Base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #060610;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ── Screen system ────────────────────────────────────── */
+    .screen { display: none; position: fixed; inset: 0; }
+    .screen.active { display: flex; }
+
+    /* ── Intro screen ─────────────────────────────────────── */
+    #screen-intro {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(124,92,252,0.12) 0%, transparent 65%), #060610;
+    }
+
+    .intro-card {
+      background: linear-gradient(145deg, #0e0e24, #141430);
+      border: 1px solid rgba(124,92,252,0.25);
+      border-radius: 20px;
+      padding: 44px 52px;
+      max-width: 560px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.65), 0 0 80px rgba(124,92,252,0.07);
+    }
+
+    .intro-icon {
+      font-size: 72px;
+      margin-bottom: 18px;
+    }
+
+    .intro-title {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a78bfa 0%, #7c5cfc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .intro-subtitle {
+      font-size: 0.95rem;
+      color: #999;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .intro-rules {
+      text-align: left;
+      background: rgba(124,92,252,0.06);
+      border: 1px solid rgba(124,92,252,0.14);
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-bottom: 28px;
+      font-size: 0.88rem;
+      color: #ccc;
+      line-height: 1.9;
+    }
+
+    .intro-rules li { list-style: none; padding-left: 4px; }
+    .intro-rules li::before { content: '◆ '; color: #7c5cfc; font-size: 0.6em; vertical-align: middle; }
+
+    /* ── Shared button ────────────────────────────────────── */
+    .btn {
+      background: linear-gradient(135deg, #7c5cfc, #a78bfa);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px 36px;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s;
+      box-shadow: 0 8px 28px rgba(124,92,252,0.35);
+    }
+    .btn:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,92,252,0.48); }
+    .btn:active { transform: translateY(0); }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(124,92,252,0.4);
+      color: #a78bfa;
+      box-shadow: none;
+      text-decoration: none;
+    }
+    .btn-ghost:hover { background: rgba(124,92,252,0.1); box-shadow: none; }
+
+    /* ── Calibration overlay ──────────────────────────────── */
+    #screen-calibrating {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      background: #060610;
+    }
+
+    .cal-msg {
+      font-size: 1.1rem;
+      color: #a78bfa;
+      font-weight: 600;
+    }
+
+    .cal-spinner {
+      width: 52px;
+      height: 52px;
+      border: 4px solid rgba(124,92,252,0.2);
+      border-top-color: #7c5cfc;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    /* ── Game screen ──────────────────────────────────────── */
+    #screen-game {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 50% 50%, rgba(60,40,140,0.18) 0%, transparent 65%), #060610;
+    }
+
+    /* HUD card */
+    .hud {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: 8px 6px;
+      background: linear-gradient(145deg, rgba(14,14,36,0.92), rgba(20,20,48,0.92));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(124,92,252,0.22);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55), 0 0 0 0.5px rgba(124,92,252,0.10);
+      z-index: 10;
+      white-space: nowrap;
+    }
+
+    .hud-item {
+      display: flex; flex-direction: column; align-items: center; gap: 1px;
+      padding: 4px 20px;
+    }
+    .hud-item + .hud-item {
+      border-left: 1px solid rgba(124,92,252,0.18);
+    }
+    .hud-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.12em; color: #555; }
+    .hud-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #e0e0e0;
+    }
+    .hud-value.accent {
+      background: linear-gradient(135deg, #a78bfa, #7c5cfc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #hud-time.danger { color: #ff3b30; }
+
+    /* Safe vault assembly */
+    .vault-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Outer countdown ring — SVG layer */
+    #svg-countdown {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    /* Gaze zone indicator (dashed ring) */
+    #svg-gazezone {
+      position: absolute;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    /* Progress arc ring — SVG layer */
+    #svg-progress {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    /* Dial container */
+    .dial-container {
+      position: relative;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 32%, #1c1840 0%, #0a0820 55%, #050412 100%);
+      box-shadow:
+        0 0 0 3px rgba(124,92,252,0.22),
+        0 0 40px rgba(124,92,252,0.10),
+        0 20px 60px rgba(0,0,0,0.8),
+        inset 0 0 30px rgba(0,0,0,0.5);
+    }
+
+    .dial-container.on-target {
+      box-shadow:
+        0 0 0 3px rgba(124,92,252,0.55),
+        0 0 60px rgba(124,92,252,0.28),
+        0 20px 60px rgba(0,0,0,0.8),
+        inset 0 0 30px rgba(0,0,0,0.5);
+    }
+
+    /* Tick marks ring — rendered in SVG */
+    #svg-dial-face { position: absolute; pointer-events: none; }
+
+    /* The spinning combination ring */
+    .combo-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+
+    /* Center knob */
+    .dial-knob {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      width: 28%;
+      height: 28%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 32%, #3a2f7a, #1a1440);
+      border: 2px solid rgba(124,92,252,0.4);
+      box-shadow: 0 0 18px rgba(124,92,252,0.2), inset 0 1px 4px rgba(255,255,255,0.06);
+    }
+
+    .dial-knob::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40%;
+      height: 40%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(167,139,250,0.6), rgba(124,92,252,0.2));
+      box-shadow: 0 0 10px rgba(124,92,252,0.4);
+    }
+
+    /* On-target glow pulse on knob */
+    .dial-knob.pulse { animation: knobPulse 0.7s ease-in-out infinite alternate; }
+
+    /* Instruction hint */
+    .gaze-hint {
+      position: fixed;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.82rem;
+      color: #555;
+      letter-spacing: 0.08em;
+      transition: color 0.3s;
+      pointer-events: none;
+    }
+    .gaze-hint.active { color: #a78bfa; }
+
+    /* ── Level-Up screen ──────────────────────────────────── */
+    #screen-levelup {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      background: radial-gradient(ellipse at 50% 40%, rgba(76,217,100,0.15) 0%, transparent 55%), #060610;
+    }
+
+    .levelup-card {
+      background: linear-gradient(145deg, #0e0e24, #141430);
+      border: 1px solid rgba(76,217,100,0.25);
+      border-radius: 20px;
+      padding: 44px 52px;
+      max-width: 460px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.65), 0 0 80px rgba(76,217,100,0.08);
+      animation: crackOpen 0.55s cubic-bezier(0.2,0,0,1.4) both;
+    }
+
+    .levelup-icon { font-size: 64px; margin-bottom: 14px; }
+
+    .levelup-title {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #4cd964;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .levelup-sub { font-size: 0.9rem; color: #999; margin-bottom: 22px; line-height: 1.6; }
+
+    .levelup-stats {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-bottom: 28px;
+    }
+
+    .stat-pill {
+      background: rgba(76,217,100,0.07);
+      border: 1px solid rgba(76,217,100,0.18);
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 0.82rem;
+    }
+    .stat-pill strong { color: #4cd964; font-size: 1.1rem; display: block; }
+
+    /* ── Game-Over screen ─────────────────────────────────── */
+    #screen-gameover {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      background:
+        radial-gradient(ellipse at 50% 35%, rgba(124,92,252,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 72%, rgba(255,59,48,0.07) 0%, transparent 48%),
+        #060610;
+    }
+
+    .gameover-card {
+      background: linear-gradient(160deg, #0c0c22 0%, #130d28 60%, #141430 100%);
+      border: 1px solid rgba(124,92,252,0.30);
+      border-radius: 24px;
+      padding: 44px 48px 40px;
+      max-width: 480px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.72), 0 0 50px rgba(124,92,252,0.10);
+      animation: goPopIn 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes goPopIn {
+      0%   { opacity: 0; transform: scale(0.82) translateY(18px); }
+      100% { opacity: 1; transform: scale(1)    translateY(0); }
+    }
+
+    .gameover-icon {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: rgba(124,92,252,0.10);
+      border: 1.5px solid rgba(124,92,252,0.32);
+      box-shadow: 0 0 28px rgba(124,92,252,0.22);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 40px;
+      line-height: 1;
+    }
+
+    .gameover-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff7a70 0%, #ff3b30 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      letter-spacing: -0.03em;
+    }
+
+    .gameover-sub {
+      font-size: 0.88rem;
+      color: #666;
+      margin-bottom: 26px;
+      line-height: 1.65;
+    }
+
+    .gameover-score {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .score-pill {
+      background: rgba(124,92,252,0.07);
+      border: 1px solid rgba(124,92,252,0.18);
+      border-radius: 14px;
+      padding: 14px 12px 12px;
+      font-size: 0.76rem;
+      color: #666;
+      letter-spacing: 0.01em;
+    }
+    .score-pill strong {
+      color: #a78bfa;
+      font-size: 1.55rem;
+      font-weight: 800;
+      display: block;
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-row .btn, .btn-row .btn-ghost { flex: 1; min-width: 130px; }
+
+    /* ── Animations ───────────────────────────────────────── */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes dialSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes knobPulse {
+      from { box-shadow: 0 0 18px rgba(124,92,252,0.2), inset 0 1px 4px rgba(255,255,255,0.06); }
+      to   { box-shadow: 0 0 32px rgba(124,92,252,0.55), 0 0 12px rgba(124,92,252,0.3), inset 0 1px 4px rgba(255,255,255,0.1); }
+    }
+
+    @keyframes crackOpen {
+      0%   { opacity: 0; transform: scale(0.82); }
+      60%  { opacity: 1; transform: scale(1.04); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes shake {
+      10%, 90%  { transform: translateX(-3px); }
+      20%, 80%  { transform: translateX(5px); }
+      30%, 50%, 70% { transform: translateX(-6px); }
+      40%, 60%  { transform: translateX(6px); }
+    }
+
+    @keyframes flashRed {
+      0%, 100% { background: radial-gradient(ellipse at 50% 50%, rgba(60,40,140,0.18) 0%, transparent 65%), #060610; }
+      50%       { background: radial-gradient(ellipse at 50% 50%, rgba(255,59,48,0.22) 0%, transparent 55%), #060610; }
+    }
+
+    @keyframes particleFly {
+      0%   { opacity: 1; transform: translate(0,0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.2); }
+    }
+
+    /* ── Particles ────────────────────────────────────────── */
+    .particle {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: particleFly 0.9s ease-out forwards;
+    }
+
+    /* ── Crosshair ───────────────────────────────────────── */
+    #game-crosshair {
+      position: fixed;
+      left: 50%; top: 50%;
+      width: 64px; height: 64px;
+      margin-left: -32px; margin-top: -32px;
+      pointer-events: none;
+      z-index: 15;
+      opacity: 0.45;
+      transition: opacity 0.2s;
+    }
+    #game-crosshair.on-target { opacity: 1; }
+    #game-crosshair::before {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%; height: 1px; margin-top: -0.5px;
+      background: linear-gradient(90deg,
+        transparent 0%, rgba(167,139,250,0.75) 10%,
+        rgba(167,139,250,0.75) 38%, transparent 44%,
+        transparent 56%, rgba(167,139,250,0.75) 62%,
+        rgba(167,139,250,0.75) 90%, transparent 100%);
+      transition: background 0.2s;
+    }
+    #game-crosshair.on-target::before {
+      background: linear-gradient(90deg,
+        transparent 0%, rgba(76,217,100,0.95) 10%,
+        rgba(76,217,100,0.95) 38%, transparent 44%,
+        transparent 56%, rgba(76,217,100,0.95) 62%,
+        rgba(76,217,100,0.95) 90%, transparent 100%);
+    }
+    #game-crosshair::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%; width: 1px; margin-left: -0.5px;
+      background: linear-gradient(180deg,
+        transparent 0%, rgba(167,139,250,0.75) 10%,
+        rgba(167,139,250,0.75) 38%, transparent 44%,
+        transparent 56%, rgba(167,139,250,0.75) 62%,
+        rgba(167,139,250,0.75) 90%, transparent 100%);
+      transition: background 0.2s;
+    }
+    #game-crosshair.on-target::after {
+      background: linear-gradient(180deg,
+        transparent 0%, rgba(76,217,100,0.95) 10%,
+        rgba(76,217,100,0.95) 38%, transparent 44%,
+        transparent 56%, rgba(76,217,100,0.95) 62%,
+        rgba(76,217,100,0.95) 90%, transparent 100%);
+    }
+    #game-crosshair .ch-dot {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(167,139,250,0.9);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 6px rgba(124,92,252,0.55);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    #game-crosshair.on-target .ch-dot {
+      background: rgba(76,217,100,1);
+      box-shadow: 0 0 10px rgba(76,217,100,0.7);
+    }
+
+    /* ── Gaze dot (optional debug) ─────────────────────────── */
+    #gaze-dot {
+      position: fixed;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(167,139,250,0.55);
+      border: 2px solid rgba(124,92,252,0.8);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      display: none;
+      z-index: 9999;
+      transition: left 0.08s linear, top 0.08s linear;
+    }
+    #gaze-dot.visible {
+      display: block;
+    }
+
+    /* ── Settings panel ──────────────────────────────────── */
+    .gear-btn {
+      position: fixed; top: 16px; right: 16px;
+      z-index: 220;
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(8,8,20,0.82); backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(124,92,252,0.20);
+      cursor: pointer; color: #aaa;
+      display: none; align-items: center; justify-content: center;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.4s ease;
+      padding: 0;
+    }
+    .gear-btn.visible { display: flex; }
+    .gear-btn:hover { background: rgba(20,20,40,0.95); color: #fff; }
+    .gear-btn[aria-expanded="true"] { color: #a78bfa; transform: rotate(60deg); }
+    .gear-btn svg { width: 20px; height: 20px; }
+
+    .settings-panel {
+      position: fixed; top: 68px; right: 16px;
+      z-index: 220;
+      background: rgba(8,8,20,0.92); backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(124,92,252,0.18); border-radius: 14px;
+      padding: 10px 12px; min-width: 230px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+    }
+    .settings-panel[hidden] { display: none; }
+    .sp-section { display: flex; flex-direction: column; gap: 6px; }
+    .sp-full-btn { width: 100%; text-align: left; box-sizing: border-box; }
+    .sp-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 8px 0; }
+    .sp-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 5px 2px; font-size: 0.88rem; color: #888;
+    }
+    .toggle-btn {
+      position: relative; width: 48px; height: 26px;
+      background: rgba(255,255,255,0.1); border-radius: 13px;
+      cursor: pointer; transition: background 0.3s ease;
+      border: none; outline: none; flex-shrink: 0;
+    }
+    .toggle-btn:focus-visible { outline: 2px solid #7c5cfc; outline-offset: 2px; }
+    .toggle-btn.on { background: #7c5cfc; }
+    .toggle-btn::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 20px; height: 20px; background: #fff; border-radius: 50%;
+      transition: transform 0.3s ease;
+    }
+    .toggle-btn.on::after { transform: translateX(22px); }
+
+    /* == VISUAL UPGRADE: charging phase + cinematic unlock == */
+
+    /* -- Game screen transitions -- */
+    #screen-game { transition: background 0.55s ease; }
+    #screen-game.on-target-active {
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(100,60,230,0.28) 0%, transparent 60%),
+        #060610;
+    }
+
+    /* -- Vault ambient glow -- */
+    #vault-glow {
+      position: fixed;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 1;
+      border-radius: 50%;
+      opacity: 0;
+      width: 500px; height: 500px;
+      transition: opacity 0.35s ease, width 0.35s ease, height 0.35s ease, background 0.4s ease;
+      background: radial-gradient(ellipse, rgba(124,92,252,0.2) 0%, transparent 70%);
+    }
+
+    /* -- Dial charging states -- */
+    .dial-container.charge-low {
+      box-shadow:
+        0 0 0 3px rgba(124,92,252,0.42),
+        0 0 55px rgba(124,92,252,0.18),
+        0 20px 60px rgba(0,0,0,0.8),
+        inset 0 0 30px rgba(0,0,0,0.4);
+    }
+    .dial-container.charge-mid {
+      box-shadow:
+        0 0 0 4px rgba(90,160,255,0.50),
+        0 0 78px rgba(90,160,255,0.26),
+        0 20px 60px rgba(0,0,0,0.8),
+        inset 0 0 25px rgba(0,0,0,0.35);
+    }
+    .dial-container.charge-high {
+      box-shadow:
+        0 0 0 4px rgba(76,217,150,0.60),
+        0 0 98px rgba(76,217,150,0.32),
+        0 20px 60px rgba(0,0,0,0.8),
+        inset 0 0 20px rgba(76,217,100,0.10);
+    }
+    .dial-container.charge-max {
+      box-shadow:
+        0 0 0 5px rgba(76,217,100,0.94),
+        0 0 140px rgba(76,217,100,0.52),
+        0 20px 60px rgba(0,0,0,0.8),
+        inset 0 0 24px rgba(76,217,100,0.22);
+      animation: maxChargePulse 0.42s ease-in-out infinite alternate;
+    }
+    @keyframes maxChargePulse {
+      from { box-shadow: 0 0 0 5px rgba(76,217,100,0.94), 0 0 140px rgba(76,217,100,0.52), 0 20px 60px rgba(0,0,0,0.8), inset 0 0 24px rgba(76,217,100,0.22); }
+      to   { box-shadow: 0 0 0 9px rgba(76,217,100,1),    0 0 200px rgba(76,217,100,0.72), 0 20px 60px rgba(0,0,0,0.8), inset 0 0 34px rgba(76,217,100,0.32); }
+    }
+
+    /* -- Dial knob energy upgrade -- */
+    .dial-knob.charge-high::after {
+      background: radial-gradient(circle, rgba(100,240,180,0.9), rgba(76,200,140,0.4));
+      box-shadow: 0 0 22px rgba(76,217,100,0.75);
+    }
+    .dial-knob.charge-max::after {
+      background: radial-gradient(circle, rgba(190,255,210,1), rgba(76,217,100,0.6));
+      box-shadow: 0 0 32px rgba(76,217,100,0.98), 0 0 8px #fff;
+    }
+
+    /* -- Cinematic flash overlay -- */
+    .flash-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 900;
+      animation: flashBurst 0.75s ease-out forwards;
+      background: radial-gradient(ellipse 65% 65% at 50% 50%,
+        rgba(255,255,255,0.97) 0%,
+        rgba(180,140,255,0.55) 28%,
+        rgba(76,217,100,0.30) 52%,
+        transparent 70%);
+    }
+    @keyframes flashBurst {
+      0%   { opacity: 0.97; transform: scale(0.35); }
+      18%  { opacity: 1;    transform: scale(1.02); }
+      100% { opacity: 0;    transform: scale(3.0);  }
+    }
+
+    /* -- Shockwave ring -- */
+    .shockwave {
+      position: fixed;
+      pointer-events: none;
+      border-radius: 50%;
+      z-index: 898;
+      animation: shockwaveExpand 0.88s cubic-bezier(0.1, 0.6, 0.3, 1) forwards;
+    }
+    @keyframes shockwaveExpand {
+      0%   { transform: translate(-50%, -50%) scale(0.15); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(4.8);  opacity: 0; }
+    }
+
+    /* -- Enhanced particle shapes -- */
+    .particle-star {
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      border-radius: 0 !important;
+    }
+    .particle-diamond {
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      border-radius: 0 !important;
+    }
+    .particle-streak { border-radius: 2px !important; }
+
+    /* -- Upgraded crackOpen (overrides earlier definition) -- */
+    @keyframes crackOpen {
+      0%   { opacity: 0; transform: scale(0.68) rotate(-5deg); filter: brightness(4) saturate(2); }
+      35%  { opacity: 1; transform: scale(1.10) rotate(2deg);  filter: brightness(1.7) saturate(1.4); }
+      62%  { transform: scale(0.95) rotate(-0.8deg);           filter: brightness(1); }
+      82%  { transform: scale(1.03); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg);     filter: brightness(1); }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       VISUAL UPGRADE v2 — Starfield · Charge · Cinematic FX
+       ═══════════════════════════════════════════════════════ */
+
+    /* ── Ambient star field ─────────────────────────────────── */
+    .star-field { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .star {
+      position: absolute; border-radius: 50%;
+      animation: twinkle var(--dur, 3s) ease-in-out infinite var(--delay, 0s); opacity: 0;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; transform: scale(0.4); }
+      50%       { opacity: var(--peak, 0.45); transform: scale(1); }
+    }
+
+    /* ── Vault ambient glow ─────────────────────────────────── */
+    #vault-glow {
+      position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      border-radius: 50%; pointer-events: none; z-index: 1;
+      opacity: 0; width: 400px; height: 400px;
+      background: radial-gradient(ellipse, rgba(124,92,252,0.22) 0%, transparent 68%);
+      transition: opacity 0.4s ease, width 0.5s ease, height 0.5s ease, background 0.5s ease;
+    }
+    .vault-glow-low  { opacity: 0.58 !important; }
+    .vault-glow-mid  {
+      opacity: 0.84 !important; width: 520px !important; height: 520px !important;
+      background: radial-gradient(ellipse, rgba(90,160,255,0.30) 0%, transparent 68%) !important;
+    }
+    .vault-glow-high {
+      opacity: 0.95 !important; width: 660px !important; height: 660px !important;
+      background: radial-gradient(ellipse, rgba(76,217,150,0.38) 0%, transparent 66%) !important;
+    }
+    .vault-glow-max  {
+      width: 760px !important; height: 760px !important;
+      background: radial-gradient(ellipse, rgba(76,217,100,0.52) 0%, transparent 60%) !important;
+      animation: vaultMaxPulse 0.44s ease-in-out infinite alternate !important;
+    }
+    @keyframes vaultMaxPulse {
+      from { opacity: 0.84; }
+      to   { opacity: 1.00; }
+    }
+
+    /* ── Dial scan lines ────────────────────────────────────── */
+    .dial-container::after {
+      content: ''; position: absolute; inset: 0; border-radius: 50%;
+      z-index: 3; pointer-events: none;
+      background: repeating-linear-gradient(180deg,
+        rgba(0,0,0,0.065) 0px, rgba(0,0,0,0.065) 1px,
+        transparent 1px, transparent 5px);
+    }
+
+    /* ── On-target ambient background ──────────────────────── */
+    #screen-game.on-target-active {
+      background:
+        radial-gradient(ellipse 55% 55% at 50% 52%, rgba(100,60,230,0.30) 0%, transparent 62%),
+        #060610;
+    }
+
+    /* ── Danger timer pulse ─────────────────────────────────── */
+    @keyframes dangerPulse {
+      0%, 100% { color: #ff3b30; }
+      50% { color: #ff7060; text-shadow: 0 0 18px rgba(255,59,48,0.9); }
+    }
+    #hud-time.danger { animation: dangerPulse 0.48s ease-in-out infinite; }
+
+    /* ── HUD success ring flash ─────────────────────────────── */
+    @keyframes hudRing {
+      0%   { border-color: rgba(124,92,252,0.22); box-shadow: 0 8px 32px rgba(0,0,0,.55), 0 0 0 .5px rgba(124,92,252,.10); }
+      30%  { border-color: rgba(76,217,100,0.90); box-shadow: 0 8px 32px rgba(0,0,0,.55), 0 0 55px rgba(76,217,100,.56), 0 0 0 2px rgba(76,217,100,.85); }
+      100% { border-color: rgba(124,92,252,0.22); box-shadow: 0 8px 32px rgba(0,0,0,.55), 0 0 0 .5px rgba(124,92,252,.10); }
+    }
+    .hud.flash-green { animation: hudRing 0.72s ease forwards; }
+
+    /* ── Shockwave ring variants ────────────────────────────── */
+    .shockwave-green  { border: 3px   solid rgba( 76,217,100,0.94); }
+    .shockwave-purple { border: 2px   solid rgba(167,139,250,0.86); }
+    .shockwave-white  { border: 1.5px solid rgba(255,255,255,0.66); }
+
+    /* ── Particle animation with rotation ──────────────────── */
+    @keyframes particleFly {
+      0%   { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(var(--tx),var(--ty)) scale(0.06) rotate(var(--rot,360deg)); }
+    }
+
+    /* ── Intro: entrance + floating icon + shimmer btn ──────── */
+    @keyframes introFadeUp {
+      from { opacity: 0; transform: translateY(28px) scale(0.96); filter: blur(3px); }
+      to   { opacity: 1; transform: none; filter: none; }
+    }
+    .intro-card { animation: introFadeUp 0.72s cubic-bezier(0.2, 0, 0, 1.12) both; }
+
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50%       { transform: translateY(-9px) scale(1.06); }
+    }
+    .intro-icon { animation: iconFloat 3.2s ease-in-out infinite; display: block; }
+
+    @keyframes btnShimmer {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+    .intro-card #btn-start {
+      background: linear-gradient(90deg, #7c5cfc 0%, #a78bfa 25%, #d4bbff 48%, #a78bfa 72%, #7c5cfc 100%);
+      background-size: 300% 100%;
+      animation: btnShimmer 3.5s linear infinite;
+    }
+
+    /* ── Level-up: stat pills pop in ───────────────────────── */
+    @keyframes pillPop {
+      0%   { transform: scale(0.55); opacity: 0; }
+      65%  { transform: scale(1.14); }
+      100% { transform: scale(1);    opacity: 1; }
+    }
+    #screen-levelup.active .stat-pill {
+      animation: pillPop 0.44s cubic-bezier(0.2, 0, 0, 1.3) both;
+    }
+    #screen-levelup.active .stat-pill:nth-child(2) { animation-delay: 0.09s; }
+    #screen-levelup.active .stat-pill:nth-child(3) { animation-delay: 0.18s; }
+

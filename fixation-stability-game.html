@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Safe Cracker — NeuroGaze</title>
+  <script src="js/webgazer.js"></script>
+  <link rel="stylesheet" href="css/fixation-stability-game.css">
+</head>
+<body>
+
+<!-- ── Optional gaze dot ──────────────────────────────────── -->
+<div id="gaze-dot"></div>
+
+<!-- INTRO -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-card">
+    <div class="intro-icon">🔐</div>
+    <div class="intro-title">The Safe Cracker</div>
+    <div class="intro-subtitle">An eye-tracking concentration challenge.<br>Use your <strong style="color:#a78bfa">gaze</strong> to crack the vault.</div>
+    <ul class="intro-rules">
+      <li>Focus your eyes on the center of the dial</li>
+      <li>Hold your gaze steady to turn the mechanism</li>
+      <li>The required focus time increases each level</li>
+      <li>If the clock runs out you lose — stay focused!</li>
+      <li>Sit ~57 cm from your screen for best results</li>
+    </ul>
+    <a href="dashboard.html" class="btn btn-ghost" style="margin-top:8px;">&#8592;Dashboard</a>
+    <button class="btn" id="btn-start">Begin Cracking</button>
+  </div>
+</div>
+
+<!-- CALIBRATING -->
+<div id="screen-calibrating" class="screen">
+  <div class="cal-spinner"></div>
+  <div class="cal-msg" id="cal-msg">Initialising eye tracker…</div>
+</div>
+
+<!-- GAME -->
+<div id="screen-game" class="screen">
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-item">
+      <span class="hud-label">Level</span>
+      <span class="hud-value accent" id="hud-level">1</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Time Left</span>
+      <span class="hud-value" id="hud-time">12s</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Focus Needed</span>
+      <span class="hud-value" id="hud-needed">2.0s</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Best Level</span>
+      <span class="hud-value accent" id="hud-best">1</span>
+    </div>
+  </div>
+
+  <!-- Vault assembly — sized & positioned by JS -->
+  <div id="game-crosshair" aria-hidden="true"><span class="ch-dot"></span></div>
+
+  <div class="vault-wrapper" id="vault-wrapper">
+    <!-- Countdown ring (outermost) -->
+    <svg id="svg-countdown"></svg>
+    <!-- Gaze zone ring -->
+    <svg id="svg-gazezone"></svg>
+    <!-- Progress arc -->
+    <svg id="svg-progress"></svg>
+    <!-- Dial face (ticks, numbers) -->
+    <svg id="svg-dial-face"></svg>
+
+    <div class="dial-container" id="dial-container">
+      <!-- Spinning combo ring (SVG canvas inside) -->
+      <canvas id="canvas-combo"></canvas>
+      <div class="dial-knob" id="dial-knob"></div>
+    </div>
+  </div>
+
+  <div class="gaze-hint" id="gaze-hint">Look at the center of the dial</div>
+</div>
+
+<!-- LEVEL-UP -->
+<div id="screen-levelup" class="screen">
+  <div class="levelup-card" id="levelup-card">
+    <div class="levelup-icon">🔓</div>
+    <div class="levelup-title">Vault Cracked!</div>
+    <div class="levelup-sub" id="levelup-sub">Level complete — the mechanism turns…</div>
+    <div class="levelup-stats">
+      <div class="stat-pill"><strong id="lu-level">—</strong>Level</div>
+      <div class="stat-pill"><strong id="lu-needed">—</strong>Focus time</div>
+      <div class="stat-pill"><strong id="lu-nextneeded">—</strong>Next level</div>
+    </div>
+    <button class="btn" id="btn-nextlevel">Next Level →</button>
+  </div>
+</div>
+
+<!-- GAME-OVER -->
+<div id="screen-gameover" class="screen">
+  <div class="gameover-card" id="gameover-card">
+    <div class="gameover-icon">🔒</div>
+    <div class="gameover-title">Vault Locked!</div>
+    <div class="gameover-sub" id="go-sub">Time ran out — the security system triggered.</div>
+    <div class="gameover-score">
+      <div class="score-pill"><strong id="go-reached">—</strong>Levels cracked</div>
+      <div class="score-pill"><strong id="go-best">—</strong>Best level</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btn-retry">Try Again</button>
+      <button class="btn btn-ghost" id="btn-menu">Menu</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/settings-panel.js"></script>
+<script src="js/fixation-stability-game.js"></script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Goldfish Scooping — NeuroGaze</title>
+  <script src="js/webgazer.js"></script>
+  <link rel="stylesheet" href="css/cpt-game.css">
+</head>
+<body>
+
+<!-- Debug gaze dot -->
+<div id="gaze-dot"></div>
+
+<!-- Screen overlays -->
+<div id="fail-flash"></div>
+<div id="success-flash"></div>
+
+<!-- Floating labels -->
+<div id="feedback-label"></div>
+<div id="combo-label"></div>
+<div id="speed-label">⚡ FASTER!</div>
+
+<!-- ███████████  INTRO  ████████████████████████████████████ -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-card">
+    <div class="intro-icon">🎏</div>
+    <div class="intro-title">Goldfish Scooping</div>
+    <div class="intro-subtitle">
+      Train your <strong style="color:#34d399">sustained attention</strong>.<br>
+      Catch the koi, ignore the lotus leaf!
+    </div>
+    <ul class="intro-rules">
+      <li>Koi fish appear above the net — press <span class="key-badge">SPACE</span> to scoop them</li>
+      <li>Lotus leaves appear too — <strong style="color:#ff6b60">do NOT press Space</strong> for leaves</li>
+      <li>Fish won't wait forever — scoop before they swim away!</li>
+      <li>Each catch speeds up the game</li>
+      <li>You have <strong style="color:#34d399">3 lives</strong> (nets) — lose one for each mistake, survive as long as you can!</li>
+      <li>Sit ~57 cm from screen for best eye tracking</li>
+    </ul>
+    <a href="dashboard.html" class="btn btn-ghost" style="margin-top:8px;">&#8592;Dashboard</a>
+    <button class="btn" id="btn-start">Begin Scooping</button>
+  </div>
+</div>
+
+<!-- CALIBRATING -->
+<div id="screen-calibrating" class="screen">
+  <div class="cal-spinner"></div>
+  <div class="cal-msg" id="cal-msg">Initialising eye tracker…</div>
+</div>
+
+<!-- GAME -->
+<div id="screen-game" class="screen">
+
+  <!-- Ambient water ripples -->
+  <div class="water-ripple" style="width:180px;height:180px;left:15%;top:35%;--dur:6s;--delay:0s;"></div>
+  <div class="water-ripple" style="width:140px;height:140px;left:72%;top:28%;--dur:5s;--delay:1.5s;"></div>
+  <div class="water-ripple" style="width:200px;height:200px;left:45%;top:55%;--dur:7s;--delay:3s;"></div>
+  <div class="water-ripple" style="width:100px;height:100px;left:80%;top:60%;--dur:4.5s;--delay:0.8s;"></div>
+  <div class="water-ripple" style="width:160px;height:160px;left:25%;top:50%;--dur:5.5s;--delay:2.2s;"></div>
+  <div class="water-ripple" style="width:120px;height:120px;left:60%;top:40%;--dur:6.5s;--delay:0.5s;"></div>
+
+  <!-- HUD -->
+  <div class="gf-hud">
+    <div class="hud-item">
+      <span class="hud-label">Catches</span>
+      <span class="hud-value accent" id="hud-score">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Streak</span>
+      <span class="hud-value" id="hud-streak">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Speed</span>
+      <span class="hud-value" id="hud-speed">1.0×</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Best</span>
+      <span class="hud-value accent" id="hud-best">0</span>
+    </div>
+  </div>
+
+  <!-- Lives bar (below HUD) -->
+  <div id="lives-bar">
+    <span class="hud-label">Lives</span>
+    <span id="hud-lives">
+      <span class="life-icon" id="life-0"><svg width="28" height="40" viewBox="0 0 130 165" fill="none"><ellipse cx="65" cy="50" rx="56" ry="38" fill="none" stroke="#c8a050" stroke-width="14"/><rect x="59" y="87" width="12" height="65" rx="6" fill="#9a7028"/></svg></span>
+      <span class="life-icon" id="life-1"><svg width="28" height="40" viewBox="0 0 130 165" fill="none"><ellipse cx="65" cy="50" rx="56" ry="38" fill="none" stroke="#c8a050" stroke-width="14"/><rect x="59" y="87" width="12" height="65" rx="6" fill="#9a7028"/></svg></span>
+      <span class="life-icon" id="life-2"><svg width="28" height="40" viewBox="0 0 130 165" fill="none"><ellipse cx="65" cy="50" rx="56" ry="38" fill="none" stroke="#c8a050" stroke-width="14"/><rect x="59" y="87" width="12" height="65" rx="6" fill="#9a7028"/></svg></span>
+    </span>
+  </div>
+
+  <!-- Timer arc around net -->
+  <div id="timer-ring-wrap">
+    <svg id="timer-svg" viewBox="0 0 300 300" width="300" height="300">
+      <circle cx="150" cy="150" r="130" fill="none" stroke="rgba(92,224,240,0.06)" stroke-width="5"/>
+      <circle id="timer-ring" cx="150" cy="150" r="130" fill="none"
+        stroke="#34d399" stroke-width="5" stroke-linecap="round"
+        stroke-dasharray="816.8" stroke-dashoffset="0"
+        transform="rotate(-90 150 150)"/>
+    </svg>
+  </div>
+
+  <!-- Spawn zone -->
+  <div id="spawn-zone"></div>
+
+  <!-- Net (handle at bottom, bowl at top) -->
+  <div id="net-container">
+    <svg id="net-svg" width="260" height="260" viewBox="0 0 260 260" fill="none">
+      <defs>
+        <linearGradient id="bambooGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#c8a050"/>
+          <stop offset="50%" stop-color="#a07830"/>
+          <stop offset="100%" stop-color="#c8a050"/>
+        </linearGradient>
+        <linearGradient id="bambooGrad2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#b89040"/>
+          <stop offset="50%" stop-color="#9a7028"/>
+          <stop offset="100%" stop-color="#b89040"/>
+        </linearGradient>
+      </defs>
+      <!-- Frame ring (top portion = bowl) -->
+      <ellipse cx="130" cy="90" rx="100" ry="72"
+               fill="none" stroke="url(#bambooGrad)" stroke-width="6"/>
+      <!-- Net mesh (semi-transparent inside) -->
+      <ellipse cx="130" cy="94" rx="92" ry="65"
+               fill="rgba(200,200,200,0.05)"
+               stroke="rgba(200,200,200,0.1)" stroke-width="0.8"/>
+      <!-- Mesh grid lines (horizontal) -->
+      <line x1="52" y1="68" x2="208" y2="68" stroke="rgba(200,200,200,0.07)" stroke-width="0.7"/>
+      <line x1="42" y1="88" x2="218" y2="88" stroke="rgba(200,200,200,0.07)" stroke-width="0.7"/>
+      <line x1="44" y1="108" x2="216" y2="108" stroke="rgba(200,200,200,0.07)" stroke-width="0.7"/>
+      <line x1="58" y1="126" x2="202" y2="126" stroke="rgba(200,200,200,0.07)" stroke-width="0.7"/>
+      <line x1="82" y1="142" x2="178" y2="142" stroke="rgba(200,200,200,0.07)" stroke-width="0.7"/>
+      <!-- Mesh grid lines (vertical) -->
+      <line x1="86" y1="28" x2="86" y2="154" stroke="rgba(200,200,200,0.05)" stroke-width="0.7"/>
+      <line x1="130" y1="22" x2="130" y2="158" stroke="rgba(200,200,200,0.05)" stroke-width="0.7"/>
+      <line x1="174" y1="28" x2="174" y2="154" stroke="rgba(200,200,200,0.05)" stroke-width="0.7"/>
+      <!-- Diagonal mesh -->
+      <line x1="40" y1="60" x2="130" y2="158" stroke="rgba(200,200,200,0.04)" stroke-width="0.6"/>
+      <line x1="220" y1="60" x2="130" y2="158" stroke="rgba(200,200,200,0.04)" stroke-width="0.6"/>
+      <!-- Handle (bottom, extending down from frame) -->
+      <rect x="123" y="158" width="14" height="80" rx="7"
+            fill="url(#bambooGrad2)" stroke="rgba(160,120,60,0.5)" stroke-width="1"/>
+      <!-- Bamboo joint rings on handle -->
+      <line x1="123" y1="185" x2="137" y2="185" stroke="rgba(160,120,60,0.4)" stroke-width="1.5"/>
+      <line x1="123" y1="210" x2="137" y2="210" stroke="rgba(160,120,60,0.4)" stroke-width="1.5"/>
+    </svg>
+  </div>
+
+  <div id="spacebar-prompt">Press <span class="key-badge" style="margin:0 3px;">SPACE</span> to scoop fish</div>
+
+</div><!-- /screen-game -->
+
+<!-- GAME-OVER -->
+<div id="screen-gameover" class="screen">
+  <div class="go-card">
+    <div class="go-icon" id="go-icon">🐟</div>
+    <div class="go-title" id="go-title">Fish Escaped!</div>
+    <div class="go-reason" id="go-reason"></div>
+    <div class="go-sub" id="go-sub"></div>
+    <div class="go-scores">
+      <div class="score-pill">
+        <strong id="go-score">0</strong>
+        Total Catches
+      </div>
+      <div class="score-pill gold">
+        <strong id="go-streak">0</strong>
+        Best Streak
+      </div>
+      <div class="score-pill highlight">
+        <strong id="go-best">0</strong>
+        All-Time Best
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btn-retry">Try Again</button>
+      <button class="btn btn-ghost" id="btn-menu">← Menu</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/settings-panel.js"></script>
+<script src="js/cpt-game.js"></script>
+</body>
+</html>

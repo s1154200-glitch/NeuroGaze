@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Distractor Recovery Task — ADHD Screening</title>
+  <script src="js/webgazer.js"></script>
+  <link rel="stylesheet" href="css/calibration.css">
+  <link rel="stylesheet" href="css/distractor-recovery-test.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       Screen: Intro
+       ============================================================ -->
+  <div id="dr-intro-screen" class="screen active" role="main">
+    <div class="dr-intro-card">
+
+      <div class="dr-logo">
+        <svg viewBox="0 0 72 72" width="64" height="64" fill="none">
+          <!-- Ambient ring -->
+          <circle cx="36" cy="36" r="33" stroke="#f59e0b" stroke-width="1.5" opacity="0.13"/>
+          <!-- Central target rings -->
+          <circle cx="36" cy="36" r="15" stroke="#f59e0b" stroke-width="2" opacity="0.75"/>
+          <circle cx="36" cy="36" r="7"  stroke="#f59e0b" stroke-width="2"/>
+          <circle cx="36" cy="36" r="3"  fill="#f59e0b"/>
+          <!-- Crosshair ticks -->
+          <line x1="36" y1="17" x2="36" y2="23" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+          <line x1="36" y1="49" x2="36" y2="55" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+          <line x1="17" y1="36" x2="23" y2="36" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+          <line x1="49" y1="36" x2="55" y2="36" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+          <!-- Distractor (bright shape at right edge) -->
+          <rect x="57" y="27" width="13" height="13" rx="3" fill="#ff3b30" opacity="0.9"/>
+          <!-- Recovery arc: curved arrow from distractor back to target -->
+          <path d="M 63 33 Q 56 50 45 40" stroke="#f59e0b" stroke-width="2"
+                fill="none" stroke-linecap="round" opacity="0.7"/>
+          <path d="M 42 37 L 45 40 L 48 37.5"
+                stroke="#f59e0b" stroke-width="2" fill="none"
+                stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+        </svg>
+      </div>
+
+      <h1>Distractor Recovery Task</h1>
+      <p class="dr-subtitle">Distractibility &amp; Gaze Reorientation Screening</p>
+
+      <div class="dr-info-grid">
+        <div class="dr-info-item">
+          <div class="dr-info-icon">⏱</div>
+          <div class="dr-info-text"><strong>2 Minutes</strong><br>Active gaze-tracking task</div>
+        </div>
+        <div class="dr-info-item">
+          <div class="dr-info-icon">⚡</div>
+          <div class="dr-info-text"><strong>4 Distractors</strong><br>Peripheral visual events</div>
+        </div>
+        <div class="dr-info-item">
+          <div class="dr-info-icon">📊</div>
+          <div class="dr-info-text"><strong>3 Biomarkers</strong><br>GRL, Capture Rate, Off-Task</div>
+        </div>
+        <div class="dr-info-item">
+          <div class="dr-info-icon">🧠</div>
+          <div class="dr-info-text"><strong>Frontoparietal</strong><br>Attention-reorientation network</div>
+        </div>
+      </div>
+
+      <div class="dr-instructions">
+        <p>
+          <span class="dr-step-num">1</span>
+          <span>A small <strong>amber target</strong> will move slowly at the center of the screen. Follow it with your eyes.</span>
+        </p>
+        <p>
+          <span class="dr-step-num">2</span>
+          <span>At random moments, a <strong>bright colored shape</strong> will flash at the edge of the screen and vanish after 1.5 seconds.</span>
+        </p>
+        <p>
+          <span class="dr-step-num">3</span>
+          <span>When the distractor disappears, <strong>return your gaze to the amber target</strong> as quickly as possible.</span>
+        </p>
+        <p>
+          <span class="dr-step-num">4</span>
+          <span>Maintain focus on the moving target throughout the full 2 minutes.</span>
+        </p>
+      </div>
+
+      <div class="dr-disclaimer">
+        ⚠ This is a <strong>research screening tool</strong>, not a clinical diagnosis. Results are indicative only.
+        Consult a qualified clinician for any diagnostic assessment.
+      </div>
+
+      <div class="dr-intro-btns">
+        <button id="dr-start-btn" class="btn btn-dr">Begin Task</button>
+        <a href="dashboard.html" class="btn btn-sm" style="text-decoration:none">← Dashboard</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Screen: Task
+       ============================================================ -->
+  <div id="dr-task-screen" class="screen" role="main" aria-label="Distractor recovery task">
+
+    <!-- Pre-task countdown -->
+    <div id="dr-countdown" class="dr-countdown" aria-live="polite" style="display:none">
+      <div class="dr-countdown-ring">
+        <svg viewBox="0 0 100 100" width="160" height="160">
+          <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(245,158,11,0.12)" stroke-width="6"/>
+          <circle id="dr-countdown-arc" cx="50" cy="50" r="44" fill="none"
+                  stroke="#f59e0b" stroke-width="6" stroke-linecap="round"
+                  stroke-dasharray="276.46" stroke-dashoffset="0"
+                  transform="rotate(-90 50 50)"/>
+        </svg>
+        <div id="dr-countdown-num" class="dr-countdown-num">3</div>
+      </div>
+      <p class="dr-countdown-label">Get ready…</p>
+    </div>
+
+    <!-- Focus zone guide ring (follows target) -->
+    <div id="dr-focus-ring" class="dr-focus-ring" aria-hidden="true"></div>
+
+    <!-- Moving target -->
+    <div id="dr-target" class="dr-target" aria-hidden="true" style="display:none">
+      <div class="dr-target-outer-ring"></div>
+      <div class="dr-target-inner-ring"></div>
+      <div class="dr-target-dot"></div>
+      <div class="dr-target-cross-h"></div>
+      <div class="dr-target-cross-v"></div>
+    </div>
+
+    <!-- Distractor element (positioned + coloured by JS) -->
+    <div id="dr-distractor" class="dr-distractor" aria-hidden="true" style="display:none"></div>
+
+    <!-- Phase / event banner -->
+    <div id="dr-phase-banner" class="dr-phase-banner" aria-live="polite"></div>
+
+    <!-- Live HUD -->
+    <div id="dr-live-hud" class="dr-live-hud" aria-live="polite" style="display:none">
+      <!-- Circular countdown timer -->
+      <div class="dr-hud-timer-wrap" title="Time remaining">
+        <svg class="dr-hud-timer-svg" viewBox="0 0 50 50" width="52" height="52">
+          <circle cx="25" cy="25" r="22" fill="none"
+                  stroke="rgba(245,158,11,0.12)" stroke-width="4"/>
+          <circle id="dr-hud-timer-arc" cx="25" cy="25" r="22" fill="none"
+                  stroke="#f59e0b" stroke-width="4" stroke-linecap="round"
+                  stroke-dasharray="138" stroke-dashoffset="0"
+                  transform="rotate(-90 25 25)"/>
+        </svg>
+        <span id="dr-hud-timer-text" class="dr-hud-timer-text">2:00</span>
+      </div>
+
+      <!-- Live metrics -->
+      <div class="dr-hud-metrics">
+        <div class="dr-hud-metric">
+          <div class="dr-hud-metric-lbl">Off-Task</div>
+          <div id="dr-hud-offtask" class="dr-hud-metric-val">0%</div>
+        </div>
+        <div class="dr-hud-metric">
+          <div class="dr-hud-metric-lbl">Captures</div>
+          <div id="dr-hud-captures" class="dr-hud-metric-val">0/4</div>
+        </div>
+        <div class="dr-hud-metric">
+          <div class="dr-hud-metric-lbl">Phase</div>
+          <div id="dr-hud-phase" class="dr-hud-metric-val">🎯 Tracking</div>
+        </div>
+        <div class="dr-hud-metric">
+          <div class="dr-hud-metric-lbl">Gaze</div>
+          <div id="dr-hud-gaze-status" class="dr-hud-metric-val dr-gaze-unknown">—</div>
+        </div>
+        <div class="dr-hud-metric">
+          <div class="dr-hud-metric-lbl">Blinks</div>
+          <div id="dr-hud-blinks" class="dr-hud-metric-val">0</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       Screen: Results
+       ============================================================ -->
+  <div id="dr-results-screen" class="screen" role="main" aria-label="Test results">
+    <div class="dr-results-wrap">
+
+      <!-- Header -->
+      <div class="dr-results-header">
+        <h2>Distractor Recovery Report</h2>
+        <p class="dr-results-subtitle">Frontoparietal Attention-Reorientation Biomarker Analysis — 2-Minute Battery</p>
+      </div>
+
+      <!-- ADHD Probability Gauge -->
+      <div class="dr-gauge-section">
+        <div class="dr-gauge-wrap">
+          <svg id="dr-gauge-svg" viewBox="0 0 200 110" width="260" height="143">
+            <path d="M 10 100 A 90 90 0 0 1 190 100" fill="none"
+                  stroke="rgba(255,255,255,0.06)" stroke-width="18" stroke-linecap="round"/>
+            <path id="dr-gauge-arc" d="M 10 100 A 90 90 0 0 1 190 100" fill="none"
+                  stroke="#4cd964" stroke-width="18" stroke-linecap="round"
+                  stroke-dasharray="283" stroke-dashoffset="283"/>
+            <g id="dr-gauge-needle" transform="rotate(-90 100 100)">
+              <line x1="100" y1="100" x2="100" y2="22"
+                    stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+              <circle cx="100" cy="100" r="5" fill="#fff" opacity="0.9"/>
+            </g>
+          </svg>
+          <div id="dr-gauge-pct" class="dr-gauge-pct-text">0%</div>
+          <div id="dr-gauge-label" class="dr-gauge-label">Calculating…</div>
+        </div>
+      </div>
+
+      <!-- Biomarker Cards -->
+      <div class="dr-cards-grid">
+
+        <!-- Gaze Reorientation Latency -->
+        <div class="dr-result-card" id="dr-card-grl">
+          <div class="dr-rc-header">
+            <span class="dr-rc-icon">⏱</span>
+            <span class="dr-rc-title">Gaze Reorientation Latency (GRL)</span>
+            <span id="dr-rc-grl-badge" class="rc-badge">—</span>
+          </div>
+          <div id="dr-rc-grl-val" class="dr-rc-val">—</div>
+          <div class="rc-bar-wrap">
+            <div id="dr-rc-grl-bar" class="rc-bar" style="width:0%"></div>
+          </div>
+          <div class="dr-rc-thresholds">
+            <span class="dr-thresh-td">TD &lt; 700ms</span>
+            <span class="dr-thresh-adhd">ADHD &gt; 1500ms</span>
+          </div>
+          <p id="dr-rc-grl-desc" class="dr-rc-desc">—</p>
+        </div>
+
+        <!-- Distractor Capture Rate -->
+        <div class="dr-result-card" id="dr-card-cap">
+          <div class="dr-rc-header">
+            <span class="dr-rc-icon">🎯</span>
+            <span class="dr-rc-title">Distractor Capture Rate</span>
+            <span id="dr-rc-cap-badge" class="rc-badge">—</span>
+          </div>
+          <div id="dr-rc-cap-val" class="dr-rc-val">—</div>
+          <div class="rc-bar-wrap">
+            <div id="dr-rc-cap-bar" class="rc-bar" style="width:0%"></div>
+          </div>
+          <div class="dr-rc-thresholds">
+            <span class="dr-thresh-td">TD &lt; 60%</span>
+            <span class="dr-thresh-adhd">ADHD &gt; 90%</span>
+          </div>
+          <p id="dr-rc-cap-desc" class="dr-rc-desc">—</p>
+        </div>
+
+        <!-- Total Off-Task Time -->
+        <div class="dr-result-card dr-card-full" id="dr-card-ot">
+          <div class="dr-rc-header">
+            <span class="dr-rc-icon">👁</span>
+            <span class="dr-rc-title">Total Off-Task Time</span>
+            <span id="dr-rc-ot-badge" class="rc-badge">—</span>
+          </div>
+          <div id="dr-rc-ot-val" class="dr-rc-val">—</div>
+          <div class="rc-bar-wrap">
+            <div id="dr-rc-ot-bar" class="rc-bar" style="width:0%"></div>
+          </div>
+          <div class="dr-rc-thresholds">
+            <span class="dr-thresh-td">TD &lt; 20%</span>
+            <span class="dr-thresh-adhd">ADHD &gt; 45%</span>
+          </div>
+          <p id="dr-rc-ot-desc" class="dr-rc-desc">—</p>
+        </div>
+
+      </div>
+
+      <!-- Per-Distractor Data Table -->
+      <div class="dr-table-section">
+        <h3>Per-Distractor Breakdown</h3>
+        <p class="dr-table-subtitle">Gaze reorientation latency for each distractor event</p>
+        <div class="dr-table-wrap">
+          <table aria-label="Per-distractor data">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Onset (task time)</th>
+                <th>Captured?</th>
+                <th>GRL</th>
+              </tr>
+            </thead>
+            <tbody id="dr-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="dr-results-summary">
+        <div id="dr-summary-icon" class="dr-summary-icon">🧠</div>
+        <div class="dr-summary-text">
+          <h3 id="dr-summary-title">Analyzing…</h3>
+          <p id="dr-summary-body">Please wait while the biomarkers are computed.</p>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="dr-results-actions">
+        <button id="dr-retest-btn" class="btn btn-dr">↺ Retest</button>
+        <a href="dashboard.html" class="btn btn-sm" style="text-decoration:none">← Dashboard</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Loading Overlay
+       ============================================================ -->
+  <div id="dr-loading-overlay" class="overlay" role="status" aria-live="polite">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <h3>Initializing Eye Tracking…</h3>
+      <p>Please allow camera access when prompted.<br>This may take a few seconds.</p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Error Overlay
+       ============================================================ -->
+  <div id="dr-error-overlay" class="overlay" role="alertdialog" aria-modal="true">
+    <div class="overlay-card">
+      <div class="icon" aria-hidden="true">⚠️</div>
+      <h3 id="dr-error-title">Something went wrong</h3>
+      <p id="dr-error-message">An unexpected error occurred.</p>
+      <button id="dr-error-btn" class="btn btn-primary">Try Again</button>
+      <button id="dr-force-recal-btn" class="btn btn-danger-sm">Full Recalibration</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Recalibration Overlay
+       ============================================================ -->
+  <div id="recalibrate-overlay" role="alertdialog" aria-modal="true">
+    <div class="recalibrate-card">
+      <div class="icon" aria-hidden="true">&#128065;</div>
+      <h3 id="recalibrate-title">Accuracy Check Required</h3>
+      <p id="recalibrate-message">Your face position has shifted. Please look at the center dot to recheck accuracy.</p>
+      <div id="recalibrate-accuracy" class="accuracy-value" style="display:none"></div>
+      <div class="recheck-btn-row">
+        <button id="recheck-btn" class="btn btn-primary">Look at Center &amp; Recheck</button>
+        <button id="modal-fullrecal-btn" class="btn btn-danger-sm">Full Recalibration</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Debug overlays (settings panel + face-tracking.js)
+       ============================================================ -->
+  <div id="gaze-dot" aria-hidden="true"></div>
+  <div id="face-boundary-box"></div>
+  <div id="position-warning">
+    <span id="position-warning-text">Move back to calibration position</span>
+  </div>
+  <div id="face-info-badge">
+    <div class="fi-label">Face Position</div>
+    <div class="fi-row">
+      <span>Offset: <span id="fi-offset" class="fi-val ok">0px</span></span>
+      <span>Depth:  <span id="fi-depth"  class="fi-val ok">100%</span></span>
+      <span>Status: <span id="fi-status" class="fi-val ok">OK</span></span>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/state.js"></script>
+  <script src="js/face-tracking.js"></script>
+  <script src="js/settings-panel.js"></script>
+  <script src="js/distractor-recovery-test.js"></script>
+</body>
+</html>

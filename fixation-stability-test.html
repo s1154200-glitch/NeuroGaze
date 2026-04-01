@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fixation Stability Test — ADHD Screening</title>
+  <script src="js/webgazer.js"></script>
+  <link rel="stylesheet" href="css/calibration.css">
+  <link rel="stylesheet" href="css/fixation-stability-test.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       Screen: Intro
+       ============================================================ -->
+  <div id="adhd-intro-screen" class="screen active" role="main">
+    <div class="adhd-intro-card">
+      <div class="adhd-logo">
+        <svg viewBox="0 0 64 64" width="56" height="56" fill="none">
+          <circle cx="32" cy="32" r="30" stroke="#7c5cfc" stroke-width="3" opacity="0.35"/>
+          <circle cx="32" cy="32" r="20" stroke="#7c5cfc" stroke-width="2" opacity="0.55"/>
+          <circle cx="32" cy="32" r="8"  fill="#7c5cfc"/>
+          <line x1="32" y1="2"  x2="32" y2="14" stroke="#7c5cfc" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+          <line x1="32" y1="50" x2="32" y2="62" stroke="#7c5cfc" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+          <line x1="2"  y1="32" x2="14" y2="32" stroke="#7c5cfc" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+          <line x1="50" y1="32" x2="62" y2="32" stroke="#7c5cfc" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+        </svg>
+      </div>
+      <h1>Fixation Stability Test</h1>
+      <p class="adhd-subtitle">ADHD Attention Biomarker Screening</p>
+
+      <div class="adhd-info-grid">
+        <div class="adhd-info-item">
+          <div class="adhd-info-icon">⏱</div>
+          <div class="adhd-info-text"><strong>30 seconds</strong><br>Sustained fixation task</div>
+        </div>
+        <div class="adhd-info-item">
+          <div class="adhd-info-icon">📊</div>
+          <div class="adhd-info-text"><strong>BCEA Analysis</strong><br>Bivariate gaze dispersion</div>
+        </div>
+        <div class="adhd-info-item">
+          <div class="adhd-info-icon">⚡</div>
+          <div class="adhd-info-text"><strong>Saccade Detection</strong><br>Square wave jerk analysis</div>
+        </div>
+        <div class="adhd-info-item">
+          <div class="adhd-info-icon">🧠</div>
+          <div class="adhd-info-text"><strong>Inhibitory Control</strong><br>Quiet Eye phase measurement</div>
+        </div>
+      </div>
+
+      <div class="adhd-instructions">
+        <p><span class="step-num">1</span> A crosshair target will appear at the center of the screen</p>
+        <p><span class="step-num">2</span> <strong>Stare directly at the center</strong> as steadily as possible for <strong>30 seconds</strong></p>
+        <p><span class="step-num">3</span> Do not move your head — keep blinking normally</p>
+        <p><span class="step-num">4</span> Your gaze stability will be measured continuously</p>
+      </div>
+
+      <div class="adhd-disclaimer">
+        ⚠ This is a <strong>research screening tool</strong>, not a clinical diagnosis. Results are indicative only. Consult a qualified clinician for any diagnostic assessment.
+      </div>
+
+      <div class="adhd-intro-btns">
+        <button id="adhd-start-btn" class="btn btn-adhd">Begin Test</button>
+        <a href="dashboard.html" class="btn btn-sm" style="text-decoration:none">← Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Screen: Fixation Task
+       ============================================================ -->
+  <div id="adhd-task-screen" class="screen" role="main" aria-label="Fixation stability task">
+
+    <!-- Countdown ring (shown before task) -->
+    <div id="adhd-countdown" class="adhd-countdown" aria-live="polite">
+      <div class="countdown-ring">
+        <svg viewBox="0 0 100 100" width="160" height="160">
+          <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(124,92,252,0.15)" stroke-width="6"/>
+          <circle id="countdown-arc" cx="50" cy="50" r="44" fill="none"
+                  stroke="#7c5cfc" stroke-width="6" stroke-linecap="round"
+                  stroke-dasharray="276.46" stroke-dashoffset="0"
+                  transform="rotate(-90 50 50)"/>
+        </svg>
+        <div id="countdown-num" class="countdown-num">3</div>
+      </div>
+      <p class="countdown-label">Get ready…</p>
+    </div>
+
+    <!-- Central fixation target -->
+    <div id="adhd-target" class="adhd-target" aria-hidden="true">
+      <div class="target-outer-ring"></div>
+      <div class="target-mid-ring"></div>
+      <div class="target-center"></div>
+      <div class="target-crosshair-h"></div>
+      <div class="target-crosshair-v"></div>
+    </div>
+
+    <!-- Live HUD -->
+    <div id="adhd-live-hud" class="adhd-live-hud" aria-live="polite">
+      <div class="hud-timer-wrap">
+        <svg viewBox="0 0 36 36" width="52" height="52" class="hud-timer-svg">
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3"/>
+          <circle id="hud-timer-arc" cx="18" cy="18" r="15.9" fill="none"
+                  stroke="#7c5cfc" stroke-width="3" stroke-linecap="round"
+                  stroke-dasharray="100" stroke-dashoffset="0"
+                  transform="rotate(-90 18 18)"/>
+        </svg>
+        <span id="adhd-timer-text" class="hud-timer-text">30</span>
+      </div>
+      <div class="hud-metrics">
+        <div class="hud-metric">
+          <div class="hud-metric-lbl">BCEA</div>
+          <div id="hud-bcea" class="hud-metric-val">—</div>
+        </div>
+        <div class="hud-metric">
+          <div class="hud-metric-lbl">Samples</div>
+          <div id="hud-samples" class="hud-metric-val">0</div>
+        </div>
+        <div class="hud-metric">
+          <div class="hud-metric-lbl">SWJs</div>
+          <div id="hud-swj" class="hud-metric-val">0</div>
+        </div>
+        <div class="hud-metric">
+          <div class="hud-metric-lbl">Stability</div>
+          <div id="hud-stability" class="hud-metric-val stability-good">—</div>
+        </div>
+        <div class="hud-metric">
+          <div class="hud-metric-lbl">Blinks</div>
+          <div id="hud-blinks" class="hud-metric-val">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gaze scatter canvas (visualizes raw gaze during task) -->
+    <canvas id="adhd-scatter-canvas" aria-hidden="true"></canvas>
+
+    <!-- Instability alert (flashes when saccade detected) -->
+    <div id="adhd-swj-alert" class="adhd-swj-alert" aria-live="assertive"></div>
+
+  </div>
+
+  <!-- ============================================================
+       Screen: Results
+       ============================================================ -->
+  <div id="adhd-results-screen" class="screen" role="main" aria-label="Test results">
+
+    <div class="adhd-results-wrap">
+      <!-- Header -->
+      <div class="results-header">
+        <h2>Fixation Stability Report</h2>
+        <p class="results-subtitle">Based on 30-second sustained fixation task</p>
+      </div>
+
+      <!-- Probability gauge -->
+      <div class="results-gauge-section">
+        <div class="gauge-wrap">
+          <svg id="results-gauge-svg" viewBox="0 0 200 110" width="260" height="143">
+            <!-- Background arc (semicircle) -->
+            <path d="M 10 100 A 90 90 0 0 1 190 100" fill="none"
+                  stroke="rgba(255,255,255,0.06)" stroke-width="18" stroke-linecap="round"/>
+            <!-- Zone arcs -->
+            <path id="gauge-arc-td"   d="M 10 100 A 90 90 0 0 1 190 100" fill="none"
+                  stroke="transparent" stroke-width="18"/>
+            <!-- Colored progress arc -->
+            <path id="results-gauge-arc" d="M 10 100 A 90 90 0 0 1 190 100" fill="none"
+                  stroke="#4cd964" stroke-width="18" stroke-linecap="round"
+                  stroke-dasharray="283" stroke-dashoffset="283"/>
+            <!-- Needle -->
+            <g id="gauge-needle" transform="rotate(-90 100 100)">
+              <line x1="100" y1="100" x2="100" y2="22" stroke="#fff" stroke-width="2.5"
+                    stroke-linecap="round" opacity="0.9"/>
+              <circle cx="100" cy="100" r="5" fill="#fff" opacity="0.9"/>
+            </g>
+          </svg>
+          <div id="gauge-pct-text" class="gauge-pct-text">0%</div>
+          <div id="gauge-label" class="gauge-label">Calculating…</div>
+        </div>
+      </div>
+
+      <!-- Biomarker cards grid -->
+      <div class="results-cards-grid">
+
+        <div class="result-card" id="card-bcea">
+          <div class="rc-header">
+            <span class="rc-icon">🎯</span>
+            <span class="rc-title">Gaze Dispersion (BCEA)</span>
+            <span id="rc-bcea-badge" class="rc-badge">—</span>
+          </div>
+          <div id="rc-bcea-val" class="rc-val">—</div>
+          <div id="rc-bcea-bar-wrap" class="rc-bar-wrap">
+            <div id="rc-bcea-bar" class="rc-bar" style="width:0%"></div>
+          </div>
+          <div class="rc-thresholds">
+            <span class="thresh-td">TD &lt; 3.5°²</span>
+            <span class="thresh-adhd">ADHD &gt; 5.0°²</span>
+          </div>
+          <p id="rc-bcea-desc" class="rc-desc">—</p>
+        </div>
+
+        <div class="result-card" id="card-variance-drift">
+          <div class="rc-header">
+            <span class="rc-icon">📈</span>
+            <span class="rc-title">Variance Drift (10s→30s)</span>
+            <span id="rc-drift-badge" class="rc-badge">—</span>
+          </div>
+          <div id="rc-drift-val" class="rc-val">—</div>
+          <div id="rc-drift-bar-wrap" class="rc-bar-wrap">
+            <div id="rc-drift-bar" class="rc-bar" style="width:0%"></div>
+          </div>
+          <div class="rc-thresholds">
+            <span class="thresh-td">Stable &lt; 25%</span>
+            <span class="thresh-adhd">ADHD &gt; 25%</span>
+          </div>
+          <p id="rc-drift-desc" class="rc-desc">—</p>
+        </div>
+
+        <div class="result-card" id="card-swj">
+          <div class="rc-header">
+            <span class="rc-icon">⚡</span>
+            <span class="rc-title">Square Wave Jerks</span>
+            <span id="rc-swj-badge" class="rc-badge">—</span>
+          </div>
+          <div id="rc-swj-val" class="rc-val">—</div>
+          <div id="rc-swj-bar-wrap" class="rc-bar-wrap">
+            <div id="rc-swj-bar" class="rc-bar" style="width:0%"></div>
+          </div>
+          <div class="rc-thresholds">
+            <span class="thresh-td">TD &lt; 3/30s</span>
+            <span class="thresh-adhd">ADHD &gt; 8/30s</span>
+          </div>
+          <p id="rc-swj-desc" class="rc-desc">—</p>
+        </div>
+
+        <div class="result-card" id="card-qe">
+          <div class="rc-header">
+            <span class="rc-icon">🧘</span>
+            <span class="rc-title">Quiet Eye Duration</span>
+            <span id="rc-qe-badge" class="rc-badge">—</span>
+          </div>
+          <div id="rc-qe-val" class="rc-val">—</div>
+          <div id="rc-qe-bar-wrap" class="rc-bar-wrap">
+            <div id="rc-qe-bar" class="rc-bar" style="width:0%"></div>
+          </div>
+          <div class="rc-thresholds">
+            <span class="thresh-td">TD &gt; 60%</span>
+            <span class="thresh-adhd">ADHD &lt; 35%</span>
+          </div>
+          <p id="rc-qe-desc" class="rc-desc">—</p>
+        </div>
+
+      </div>
+
+      <!-- Scatter plot of gaze during test -->
+      <div class="results-scatter-section">
+        <h3>Gaze Scatter Plot</h3>
+        <p class="scatter-subtitle">Each dot = one gaze sample during fixation. Tight clustering = high stability.</p>
+        <div class="scatter-container">
+          <canvas id="results-scatter-canvas" width="320" height="240"></canvas>
+          <div class="scatter-legend">
+            <span class="legend-dot td"></span> TD zone (1.5°²)
+            <span class="legend-dot adhd" style="margin-left:14px"></span> ADHD zone (3.0°²)
+          </div>
+        </div>
+      </div>
+
+      <!-- Temporal variance chart -->
+      <div class="results-temporal-section">
+        <h3>Attention Stability Over Time</h3>
+        <p class="scatter-subtitle">Rolling gaze dispersion across the 30-second window. Flat = stable attention.</p>
+        <canvas id="results-temporal-canvas" width="600" height="120"></canvas>
+      </div>
+
+      <!-- Summary interpretation -->
+      <div id="results-summary" class="results-summary">
+        <div id="results-summary-icon" class="summary-icon">🧠</div>
+        <div class="summary-text">
+          <h3 id="results-summary-title">Analyzing…</h3>
+          <p id="results-summary-body">Please wait while the biomarkers are computed.</p>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="results-actions">
+        <button id="adhd-retest-btn" class="btn btn-adhd">↺ Retest</button>
+        <a href="dashboard.html" class="btn btn-sm" style="text-decoration:none">← Dashboard</a>
+      </div>
+
+    </div><!-- /adhd-results-wrap -->
+  </div>
+
+  <!-- Loading overlay (reused) -->
+  <div id="adhd-loading-overlay" class="overlay" role="status" aria-live="polite">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <h3>Initializing Eye Tracking…</h3>
+      <p>Please allow camera access when prompted.<br>This may take a few seconds.</p>
+    </div>
+  </div>
+
+  <!-- Error overlay -->
+  <div id="adhd-error-overlay" class="overlay" role="alertdialog" aria-modal="true">
+    <div class="overlay-card">
+      <div class="icon" aria-hidden="true">⚠️</div>
+      <h3 id="adhd-error-title">Something went wrong</h3>
+      <p  id="adhd-error-message">An unexpected error occurred.</p>
+      <button id="adhd-error-btn" class="btn btn-primary">Try Again</button>
+      <button id="force-recalibrate-btn" class="btn btn-danger-sm">Full Recalibration</button>
+    </div>
+  </div>
+
+  <!-- Recalibration overlay (mirrors calibration.html) ─────────── -->
+  <div id="recalibrate-overlay" role="alertdialog" aria-modal="true">
+    <div class="recalibrate-card">
+      <div class="icon" aria-hidden="true">&#128065;</div>
+      <h3 id="recalibrate-title">Accuracy Check Required</h3>
+      <p id="recalibrate-message">Your face position has shifted significantly. Please look at the center dot to recheck accuracy.</p>
+      <div id="recalibrate-accuracy" class="accuracy-value" style="display:none"></div>
+      <div class="recheck-btn-row">
+        <button id="recheck-btn" class="btn btn-primary">Look at Center &amp; Recheck</button>
+        <button id="modal-fullrecal-btn" class="btn btn-danger-sm">Full Recalibration</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Debug elements used by gear-panel settings ─────────────── -->
+  <div id="gaze-dot" aria-hidden="true"></div>
+  <div id="face-boundary-box"></div>
+  <div id="position-warning">
+    <span id="position-warning-text">Move back to calibration position</span>
+  </div>
+  <div id="face-info-badge">
+    <div class="fi-label">Face Position</div>
+    <div class="fi-row">
+      <span>Offset: <span id="fi-offset" class="fi-val ok">0px</span></span>
+      <span>Depth:  <span id="fi-depth"  class="fi-val ok">100%</span></span>
+      <span>Status: <span id="fi-status" class="fi-val ok">OK</span></span>
+    </div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/face-tracking.js"></script>
+  <script src="js/settings-panel.js"></script>
+  <script src="js/fixation-stability-test.js"></script>
+</body>
+</html>

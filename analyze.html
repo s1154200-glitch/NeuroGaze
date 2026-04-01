@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroGaze — Analysis Report</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link rel="stylesheet" href="css/analyze.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       Sidebar
+       ============================================================ -->
+  <aside class="sidebar expanded" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <svg viewBox="0 0 40 40" width="36" height="36" fill="none">
+          <circle cx="20" cy="20" r="18" stroke="#7c5cfc" stroke-width="2.5"/>
+          <circle cx="20" cy="20" r="10" stroke="#7c5cfc" stroke-width="1.5" opacity="0.6"/>
+          <circle cx="20" cy="20" r="4"  fill="#7c5cfc"/>
+        </svg>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item" data-page="dashboard" title="Dashboard" onclick="location.href='dashboard.html'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-page="calibration" title="Calibration" onclick="location.href='calibration.html'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+          </svg>
+          <span>Calibration</span>
+        </button>
+        <div class="nav-group" id="nav-group-tests">
+          <button class="nav-item nav-dropdown-toggle" data-page="tests" id="nav-tests" title="ADHD Tests">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+              <rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/>
+            </svg>
+            <span>ADHD Tests</span>
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="nav-submenu" id="nav-submenu-tests">
+            <a class="nav-subitem nav-subitem-ready" href="fixation-stability-test.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+              Fixation Stability
+            </a>
+            <a class="nav-subitem nav-subitem-ready" href="antisaccade-test.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              Antisaccade Test
+            </a>
+            <a class="nav-subitem nav-subitem-ready" href="cpt-test.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              CPT
+            </a>
+            <a class="nav-subitem nav-subitem-ready" href="distractor-recovery-test.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-5"/></svg>
+              Distractor Recovery
+            </a>
+          </div>
+        </div>
+        <div class="nav-group" id="nav-group-trains">
+          <button class="nav-item nav-dropdown-toggle" data-page="trains" id="nav-trains" title="ADHD Trains">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 12h12"/><path d="M6 8v8"/><path d="M18 8v8"/><path d="M3 10v4"/><path d="M21 10v4"/>
+            </svg>
+            <span>ADHD Trains</span>
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="nav-submenu" id="nav-submenu-trains">
+            <a class="nav-subitem nav-subitem-ready" href="fixation-stability-game.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+              Fixation Stability
+            </a>
+            <a class="nav-subitem nav-subitem-ready" href="antisaccade-game.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              Antisaccade Test
+            </a>
+            <a class="nav-subitem nav-subitem-ready" href="cpt-game.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              CPT
+            </a>
+            <a class="nav-subitem nav-subitem-ready" href="distractor-recovery-game.html">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-5"/></svg>
+              Distractor Recovery
+            </a>
+          </div>
+        </div>
+        <button class="nav-item" data-page="results" title="Results" onclick="location.href='results.html'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+            <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+          </svg>
+          <span>Results</span>
+        </button>
+        <button class="nav-item active" data-page="analyze" title="Analysis">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 21H4a1 1 0 0 1-1-1V3"/><path d="m7 14 4-4 4 4 6-6"/>
+          </svg>
+          <span>Analysis</span>
+        </button>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+    </div>
+  </aside>
+
+  <!-- ============================================================
+       Main Content
+       ============================================================ -->
+  <main class="main">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h1 class="page-title">NeuroGaze</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-pill">
+          <span class="pill-dot"></span>
+          Calibration: <strong id="cal-status">Not Done</strong>
+        </div>
+        <div class="topbar-pill">Date: <strong id="dash-date">—</strong></div>
+      </div>
+    </header>
+
+    <!-- ── Analysis content ──────────────────────────────────── -->
+    <section class="dash-grid">
+      <div class="analyze-grid" id="analyze-root">
+
+        <!-- Header -->
+        <div class="az-header">
+          <div>
+            <h2>Progress Analysis Report</h2>
+            <p>Longitudinal trends, progress tracking, and personalised recommendations</p>
+          </div>
+          <button class="az-btn" id="btn-pdf" title="Download as PDF">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg>
+            Download PDF
+          </button>
+        </div>
+
+        <!-- Empty state (shown when no data) -->
+        <div class="az-card az-empty-state" id="az-empty" style="display:none">
+          <div class="az-empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 21H4a1 1 0 0 1-1-1V3"/><path d="m7 14 4-4 4 4 6-6"/></svg>
+            <p>No test data available yet.<br>Complete at least one ADHD test to generate your analysis report.</p>
+          </div>
+        </div>
+
+        <!-- 1. Fixation Stability Analysis -->
+        <div class="az-card" id="az-fixation" style="display:none">
+          <div class="az-card-hdr">
+            <h3>Fixation Stability</h3>
+            <span class="az-badge" id="fix-trend-badge"></span>
+            <button class="card-dots" aria-label="More options" data-menu="menu-fix">···</button>
+            <div class="az-card-menu" id="menu-fix">
+              <button class="az-del-btn" data-delete="fixation">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                Delete Fixation Data
+              </button>
+            </div>
+          </div>
+          <div class="az-chart-wrap"><canvas id="chart-fixation"></canvas></div>
+          <div class="az-metrics" id="fix-metrics"></div>
+          <div class="az-insight" id="fix-insight"></div>
+        </div>
+
+        <!-- 2. Antisaccade Analysis -->
+        <div class="az-card" id="az-antisaccade" style="display:none">
+          <div class="az-card-hdr">
+            <h3>Antisaccade Test</h3>
+            <span class="az-badge" id="ast-trend-badge"></span>
+            <button class="card-dots" aria-label="More options" data-menu="menu-ast">···</button>
+            <div class="az-card-menu" id="menu-ast">
+              <button class="az-del-btn" data-delete="antisaccade">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                Delete Antisaccade Data
+              </button>
+            </div>
+          </div>
+          <div class="az-chart-wrap"><canvas id="chart-antisaccade"></canvas></div>
+          <div class="az-metrics" id="ast-metrics"></div>
+          <div class="az-insight" id="ast-insight"></div>
+        </div>
+
+        <!-- 3. CPT Analysis -->
+        <div class="az-card" id="az-cpt" style="display:none">
+          <div class="az-card-hdr">
+            <h3>Continuous Performance Test (CPT)</h3>
+            <span class="az-badge" id="cpt-trend-badge"></span>
+            <button class="card-dots" aria-label="More options" data-menu="menu-cpt">···</button>
+            <div class="az-card-menu" id="menu-cpt">
+              <button class="az-del-btn" data-delete="cpt">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                Delete CPT Data
+              </button>
+            </div>
+          </div>
+          <div class="az-chart-wrap"><canvas id="chart-cpt"></canvas></div>
+          <div class="az-metrics" id="cpt-metrics"></div>
+          <div class="az-insight" id="cpt-insight"></div>
+        </div>
+
+        <!-- 4. Distractor Recovery Analysis -->
+        <div class="az-card" id="az-dr" style="display:none">
+          <div class="az-card-hdr">
+            <h3>Distractor Recovery</h3>
+            <span class="az-badge" id="dr-trend-badge"></span>
+            <button class="card-dots" aria-label="More options" data-menu="menu-dr">···</button>
+            <div class="az-card-menu" id="menu-dr">
+              <button class="az-del-btn" data-delete="dr">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                Delete DR Data
+              </button>
+            </div>
+          </div>
+          <div class="az-chart-wrap"><canvas id="chart-dr"></canvas></div>
+          <div class="az-metrics" id="dr-metrics"></div>
+          <div class="az-insight" id="dr-insight"></div>
+        </div>
+
+        <!-- 5. Overall Analysis -->
+        <div class="az-card az-overall" id="az-overall" style="display:none">
+          <div class="az-card-hdr">
+            <h3>Overall ADHD Screening Analysis</h3>
+            <button class="card-dots" aria-label="More options" data-menu="menu-overall">···</button>
+            <div class="az-card-menu" id="menu-overall">
+              <button class="az-del-btn" data-delete="all">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                Delete All Test Data
+              </button>
+            </div>
+          </div>
+          <div class="az-chart-wrap"><canvas id="chart-overall"></canvas></div>
+          <div class="az-overall-metrics" id="overall-metrics"></div>
+          <hr class="az-divider">
+          <div class="az-insight" id="overall-insight" style="margin-top:14px"></div>
+          <h4 style="color:#fff;font-size:.9rem;margin:18px 0 6px">Personalised Recommendations</h4>
+          <ul class="az-suggestions" id="overall-suggestions"></ul>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script src="js/analyze.js"></script>
+</body>
+</html>
