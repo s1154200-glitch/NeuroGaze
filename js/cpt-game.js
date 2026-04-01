@@ -220,26 +220,33 @@
   // ─────────────────────────────────────────────────────────
   function makeLotusLeafSVG() {
     var lid = 'lotus' + Date.now() + Math.floor(Math.random() * 9999);
-    // Lily-pad: proper arc path with V-notch, solid fills only (no url() refs), veins clipped inside
-    var leafPath = 'M 100 100 L 77 18 A 85 85 0 1 1 123 18 Z';
-    var veins = [
-      [100,15],[138,24],[166,52],[176,90],[166,138],[138,166],[100,175],[62,166],[34,138],[24,90],[34,52],[62,24]
-    ];
-    var veinLines = '';
-    for (var v = 0; v < veins.length; v++) {
-      veinLines += '<line x1="100" y1="100" x2="' + veins[v][0] + '" y2="' + veins[v][1] + '"/>';
-    }
-    return '<svg viewBox="0 0 200 200" width="180" height="180" xmlns="http://www.w3.org/2000/svg">' +
+    // Bright green lily pad matching reference — pac-man shape with transparent V-notch
+    return '<svg viewBox="0 0 120 120" width="180" height="180" xmlns="http://www.w3.org/2000/svg">' +
       '<defs>' +
-        '<clipPath id="' + lid + '-c"><path d="' + leafPath + '"/></clipPath>' +
+        '<mask id="' + lid + '-m">' +
+          '<rect width="120" height="120" fill="white"/>' +
+          '<path d="M 60 60 L 52 8 Q 60 2 68 8 Z" fill="black"/>' +
+        '</mask>' +
       '</defs>' +
-      '<ellipse cx="104" cy="108" rx="82" ry="82" fill="rgba(0,0,0,0.15)"/>' +
-      '<path d="' + leafPath + '" fill="#3aa84e" stroke="#1d6b2e" stroke-width="2.5"/>' +
-      '<path d="' + leafPath + '" fill="rgba(120,220,140,0.18)" clip-path="url(#' + lid + '-c)"/>' +
-      '<g clip-path="url(#' + lid + '-c)" stroke="#4abf60" stroke-width="1.1" fill="none" opacity="0.55">' +
-        veinLines +
+      // Shadow
+      '<circle cx="64" cy="64" r="48" fill="rgba(0,0,0,0.1)"/>' +
+      // Leaf body
+      '<circle cx="60" cy="60" r="48" fill="#3a9d50" stroke="#2e8040" stroke-width="1" mask="url(#' + lid + '-m)"/>' +
+      // Lighter inner ring
+      '<circle cx="60" cy="60" r="40" fill="none" stroke="rgba(120,220,120,0.15)" stroke-width="1" mask="url(#' + lid + '-m)"/>' +
+      // Veins radiating from center (masked)
+      '<g mask="url(#' + lid + '-m)" opacity="0.35">' +
+        '<line x1="60" y1="60" x2="60" y2="14" stroke="#6abf6a" stroke-width="1"/>' +
+        '<line x1="60" y1="60" x2="26" y2="32" stroke="#6abf6a" stroke-width="0.8"/>' +
+        '<line x1="60" y1="60" x2="94" y2="32" stroke="#6abf6a" stroke-width="0.8"/>' +
+        '<line x1="60" y1="60" x2="14" y2="56" stroke="#6abf6a" stroke-width="0.7"/>' +
+        '<line x1="60" y1="60" x2="106" y2="56" stroke="#6abf6a" stroke-width="0.7"/>' +
+        '<line x1="60" y1="60" x2="30" y2="90" stroke="#6abf6a" stroke-width="0.7"/>' +
+        '<line x1="60" y1="60" x2="90" y2="90" stroke="#6abf6a" stroke-width="0.7"/>' +
+        '<line x1="60" y1="60" x2="60" y2="106" stroke="#6abf6a" stroke-width="0.7"/>' +
       '</g>' +
-      '<circle cx="100" cy="100" r="5" fill="rgba(160,255,180,0.50)" clip-path="url(#' + lid + '-c)"/>' +
+      // Center dot
+      '<circle cx="60" cy="60" r="3" fill="rgba(120,200,120,0.3)" mask="url(#' + lid + '-m)"/>' +
     '</svg>';
   }
 
