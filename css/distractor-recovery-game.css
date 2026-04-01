@@ -821,15 +821,23 @@
    Base = mobile default; min-width queries restore desktop behaviour
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Intro / gameover / levelup screens — allow natural scroll on mobile */
-#screen-intro,
+/* Gameover / levelup screens — scrollable, horizontally centred */
 #screen-gameover,
 #screen-levelup {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
   padding: 1.25rem 0 3rem;
+}
+
+/* Intro screen — short content, fully centred on mobile */
+#screen-intro {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 0 2rem;
 }
 
 /* Intro card — no fixed max-height on mobile; full-width with breathing room */
