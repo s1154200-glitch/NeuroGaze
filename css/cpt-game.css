@@ -818,6 +818,7 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   align-items: flex-start;
+  justify-content: flex-start;
   padding: 1.25rem 0 3rem;
 }
 
@@ -877,6 +878,7 @@
   #screen-gameover,
   #screen-levelup {
     align-items: center;
+    justify-content: center;
     padding: 2rem 0;
   }
 

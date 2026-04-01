@@ -763,6 +763,7 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   align-items: flex-start;
+  justify-content: flex-start;
   padding: 1.25rem 0 3rem;
 }
 
@@ -826,6 +827,7 @@
 @media (min-width: 640px) {
   #ast-intro-screen {
     align-items: center;
+    justify-content: center;
     padding: 1.75rem 1.25rem 3rem;
   }
 
