@@ -100,10 +100,16 @@ CalApp.handleDotClick = function (idx) {
   s.dotClicks[idx]++;
   CalApp.refreshDotRing(idx);
 
+  // Always tell WebGazer the user was looking at the dot's actual position,
+  // not wherever they physically clicked/tapped.
+  var tx = CalApp.POINTS[idx].x / 100 * window.innerWidth;
+  var ty = CalApp.POINTS[idx].y / 100 * window.innerHeight;
+  if (typeof webgazer !== 'undefined' && typeof webgazer.recordScreenPosition === 'function') {
+    webgazer.recordScreenPosition(tx, ty, 'click');
+  }
+
   // Record prediction-error sample if gaze data is available
   if (s.latestGaze) {
-    var tx = CalApp.POINTS[idx].x / 100 * window.innerWidth;
-    var ty = CalApp.POINTS[idx].y / 100 * window.innerHeight;
     var dx = tx - s.latestGaze.x;
     var dy = ty - s.latestGaze.y;
     s.clickSamples.push(Math.sqrt(dx * dx + dy * dy));
@@ -181,8 +187,12 @@ CalApp.startCalibration = function () {
   // On touch devices: tap anywhere on the calibration screen to register a click on the current dot
   if (!CalApp._tapAnywhere) {
     CalApp._tapAnywhere = function (e) {
-      // Only fire on touch; ignore if the tap target is the dot button itself (it has its own listener)
+      // Only fire on touch; ignore mouse so desktop click goes to dot button normally
       if (e.pointerType === 'mouse') return;
+      // Prevent the subsequent 'click' event — WebGazer listens for 'click' on document
+      // (capture phase) and would train itself at the wrong tap coordinates instead of
+      // the dot's actual position.  We handle training explicitly in handleDotClick.
+      e.preventDefault();
       var s = CalApp.state;
       if (s.currentIdx < CalApp.POINTS.length) {
         CalApp.handleDotClick(s.currentIdx);
