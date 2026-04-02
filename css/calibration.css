@@ -187,6 +187,7 @@ html, body {
   text-align: left; margin-bottom: 34px; padding: 20px 24px;
   background: rgba(255,255,255,0.025);
   border-radius: 14px; border: 1px solid rgba(255,255,255,0.04);
+  max-width: 520px; margin-left: auto; margin-right: auto;
 }
 
 .steps p {
