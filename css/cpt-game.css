@@ -29,10 +29,8 @@
       border: 1px solid rgba(52,211,153,0.22);
       border-radius: 20px;
       padding: 40px 48px;
-      max-width: 520px;
+      max-width: 560px;
       width: 90%;
-      margin-left: auto;
-      margin-right: auto;
       text-align: center;
       box-shadow: 0 30px 90px rgba(0,0,0,0.65), 0 0 80px rgba(52,211,153,0.06);
       max-height: 95vh;
@@ -607,10 +605,8 @@
       border: 1px solid rgba(52,211,153,0.28);
       border-radius: 24px;
       padding: 44px 48px 40px;
-      max-width: 520px;
+      max-width: 480px;
       width: 90%;
-      margin-left: auto;
-      margin-right: auto;
       text-align: center;
       box-shadow: 0 32px 80px rgba(0,0,0,0.72), 0 0 50px rgba(52,211,153,0.08);
       animation: goPopIn 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -618,20 +614,6 @@
     @keyframes goPopIn {
       0%   { opacity: 0; transform: scale(0.82) translateY(18px); }
       100% { opacity: 1; transform: scale(1)    translateY(0); }
-    }
-
-    .levelup-card {
-      background: linear-gradient(160deg, #060e10 0%, #091810 60%, #0c1018 100%);
-      border: 1px solid rgba(52,211,153,0.28);
-      border-radius: 24px;
-      padding: 44px 48px 40px;
-      max-width: 520px;
-      width: 90%;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: center;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.72), 0 0 50px rgba(52,211,153,0.08);
-      animation: goPopIn 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     .go-icon {
