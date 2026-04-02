@@ -165,7 +165,8 @@ html, body {
    Welcome Screen
    ============================================================ */
 .welcome-card {
-  text-align: center; max-width: 580px; padding: 48px 44px;
+  text-align: center; max-width: 520px; padding: 48px 44px;
+  margin-left: auto; margin-right: auto;
   background: linear-gradient(145deg, #14142b, #1a1a35);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 22px;
