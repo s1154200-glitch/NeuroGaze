@@ -959,3 +959,25 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+/* ── WebGazer camera overlay: cap size on mobile ── */
+@media (max-width: 640px) {
+  #webgazerVideoContainer {
+    width: 120px !important;
+    height: 90px !important;
+    max-width: 120px !important;
+    max-height: 90px !important;
+    top: 8px !important;
+    left: 8px !important;
+    right: auto !important;
+    bottom: auto !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+  }
+  #webgazerVideoContainer video,
+  #webgazerVideoContainer canvas {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+}
