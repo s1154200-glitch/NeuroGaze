@@ -187,12 +187,20 @@ CalApp.startCalibration = function () {
   // On touch devices: tap anywhere on the calibration screen to register a click on the current dot
   if (!CalApp._tapAnywhere) {
     CalApp._tapAnywhere = function (e) {
-      // Only fire on touch; ignore mouse so desktop click goes to dot button normally
+      // Only fire on touch
       if (e.pointerType === 'mouse') return;
-      // Prevent the subsequent 'click' event — WebGazer listens for 'click' on document
-      // (capture phase) and would train itself at the wrong tap coordinates instead of
-      // the dot's actual position.  We handle training explicitly in handleDotClick.
+
+      // If the tap landed directly on the dot button, let the button's own click
+      // listener handle it — avoid calling handleDotClick twice.
+      // Training at the button's position is already correct (it sits on the dot).
+      if (e.target.closest('.cal-dot')) return;
+
+      // Tap was somewhere else on screen.
+      // Prevent the browser from synthesising a 'click' event at the wrong coords —
+      // WebGazer listens for 'click' on document (capture phase) and would train
+      // itself at the tap position instead of the dot's position.
       e.preventDefault();
+
       var s = CalApp.state;
       if (s.currentIdx < CalApp.POINTS.length) {
         CalApp.handleDotClick(s.currentIdx);
