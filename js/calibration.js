@@ -65,7 +65,7 @@ CalApp.activateDot = function (idx) {
     'Look at red dot ' + (idx + 1) + ' of ' + CalApp.POINTS.length +
     ' \u2014 ' +
     (window.matchMedia('(pointer: coarse)').matches
-      ? 'tap the red dot ' : 'click it ') +
+      ? 'tap anywhere ' : 'click it ') +
     CalApp.CLICKS_PER_POINT + ' times. Keep your head still.';
 };
 
@@ -183,6 +183,29 @@ CalApp.startCalibration = function () {
   }
 
   setTimeout(function () { CalApp.activateDot(0); }, 620);
+
+  // On touch devices: tap anywhere on the calibration screen to register a click on the current dot
+  if (!CalApp._tapAnywhere) {
+    CalApp._tapAnywhere = function (e) {
+      // If the touch landed on the dot button itself, let the button's own
+      // click listener handle it — avoids double-registration.
+      if (e.target && e.target.closest && e.target.closest('.cal-dot')) return;
+
+      // Block the synthesised 'click' that follows a touch — WebGazer listens
+      // for 'click' on document (capture phase) and would train itself at the
+      // tap position instead of the dot's actual position.
+      e.preventDefault();
+
+      var s = CalApp.state;
+      if (s.currentIdx < CalApp.POINTS.length) {
+        CalApp.handleDotClick(s.currentIdx);
+      }
+    };
+    var calScreen = CalApp.dom.screens.calibration;
+    // Use 'touchstart' (not 'pointerdown') — touchstart works on all iOS/Android
+    // versions. { passive: false } is required to allow e.preventDefault().
+    calScreen.addEventListener('touchstart', CalApp._tapAnywhere, { passive: false });
+  }
 };
 
 CalApp.finishCalibration = function () {
