@@ -43,4 +43,33 @@ CalApp.initWebGazer = async function () {
   });
 
   await webgazer.begin();
+
+  // Reduce and constrain preview size on small screens (phone interface) to avoid oversize camera overlay.
+  function clampWebgazerPreview() {
+    var vc = document.getElementById('webgazerVideoContainer');
+    if (!vc) return;
+
+    vc.style.position = 'fixed';
+    vc.style.top = '12px';
+    vc.style.left = '12px';
+    vc.style.width = '220px';
+    vc.style.height = '165px';
+    vc.style.maxWidth = 'calc(90vw)';
+    vc.style.maxHeight = '30vh';
+    vc.style.borderRadius = '10px';
+    vc.style.overflow = 'hidden';
+    vc.style.zIndex = '700';
+
+    var videoEl = vc.querySelector('video');
+    var canvasEl = vc.querySelector('canvas');
+    [videoEl, canvasEl].forEach(function (child) {
+      if (!child) return;
+      child.style.width = '100%';
+      child.style.height = '100%';
+      child.style.objectFit = 'cover';
+    });
+  }
+
+  clampWebgazerPreview();
+  setTimeout(clampWebgazerPreview, 350); // ensure after any delayed webgazer setup
 };
