@@ -59,15 +59,8 @@ CalApp.initWebGazer = async function () {
     vc.style.borderRadius = '10px';
     vc.style.overflow = 'hidden';
     vc.style.zIndex = '700';
-
-    var videoEl = vc.querySelector('video');
-    var canvasEl = vc.querySelector('canvas');
-    [videoEl, canvasEl].forEach(function (child) {
-      if (!child) return;
-      child.style.width = '100%';
-      child.style.height = '100%';
-      child.style.objectFit = 'cover';
-    });
+    // Do NOT resize the video/canvas children — WebGazer reads their rendered
+    // dimensions for face-coordinate mapping. Resizing breaks gaze predictions.
   }
 
   clampWebgazerPreview();
