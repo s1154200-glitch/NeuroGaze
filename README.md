@@ -17,7 +17,7 @@
 ---
 
 ## Demo
-![NeuroGaze](https://s1154200-glitch.github.io/NeuroGaze/dashboard.html)
+[NeuroGaze](https://s1154200-glitch.github.io/NeuroGaze/dashboard.html)
 
 ---
 ## Contents
